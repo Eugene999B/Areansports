@@ -131,11 +131,11 @@ Responses expose supported capability truth, including whether an authorized res
 
 ## Tournaments
 
-- `GET /tournaments` ? public discovery
-- `POST /tournaments` ? create draft; idempotent
+- `GET /tournaments` - public discovery
+- `POST /tournaments` - create draft; idempotent
 - `GET /tournaments/:tournamentId`
-- `PATCH /tournaments/:tournamentId` ? draft-safe fields with version
-- `POST /tournaments/:tournamentId/publish` ? idempotent transition
+- `PATCH /tournaments/:tournamentId` - draft-safe fields with version
+- `POST /tournaments/:tournamentId/publish` - idempotent transition
 - `POST /tournaments/:tournamentId/cancel`
 - `GET /tournaments/:tournamentId/rules`
 - `GET /tournaments/:tournamentId/timeline`
@@ -149,9 +149,9 @@ Publication response includes immutable ruleset version and digest.
 ## Registration
 
 - `GET /tournaments/:tournamentId/registrations/me`
-- `POST /tournaments/:tournamentId/registrations` ? idempotent
+- `POST /tournaments/:tournamentId/registrations` - idempotent
 - `DELETE /tournaments/:tournamentId/registrations/me`
-- `GET /tournaments/:tournamentId/registrations` ? authorized staff
+- `GET /tournaments/:tournamentId/registrations` - authorized staff
 - `POST /tournaments/:tournamentId/registrations/:registrationId/approve`
 - `POST /tournaments/:tournamentId/registrations/:registrationId/reject`
 - `POST /tournaments/:tournamentId/registration-lock`
@@ -173,11 +173,11 @@ Clients cannot write standings or bracket advancement.
 
 - `GET /matches/:matchId`
 - `GET /matches/:matchId/timeline`
-- `POST /matches/:matchId/check-ins` ? idempotent
+- `POST /matches/:matchId/check-ins` - idempotent
 - `POST /matches/:matchId/availability-proposals`
 - `POST /matches/:matchId/availability-proposals/:proposalId/accept`
 - `POST /matches/:matchId/availability-proposals/:proposalId/reject`
-- `POST /matches/:matchId/submissions` ? idempotent
+- `POST /matches/:matchId/submissions` - idempotent
 - `POST /matches/:matchId/submissions/:submissionId/confirm`
 - `POST /matches/:matchId/submissions/:submissionId/dispute`
 - `POST /matches/:matchId/no-show-claims`
@@ -189,9 +189,9 @@ Match detail exposes the user's allowed actions, not only raw status, so mobile 
 
 - `POST /matches/:matchId/evidence/upload-authorizations`
 - `POST /matches/:matchId/evidence/:evidenceId/complete`
-- `GET /matches/:matchId/evidence` ? authorized/redacted
+- `GET /matches/:matchId/evidence` - authorized/redacted
 - `POST /evidence/:evidenceId/read-authorization`
-- `DELETE /evidence/:evidenceId` ? only if lifecycle and retention allow
+- `DELETE /evidence/:evidenceId` - only if lifecycle and retention allow
 
 Upload authorization constrains object key, content type, size, checksum, and expiry.
 

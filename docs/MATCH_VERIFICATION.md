@@ -8,15 +8,15 @@ ArenaSports needs trustworthy outcomes without pretending to have access to priv
 
 Every resolution carries one source:
 
-1. **Mutual confirmation** ? one submission confirmed by the opponent.
-2. **Compatible independent submissions** ? both players submitted the same normalized outcome.
-3. **Rules-based forfeit** ? server-recorded conditions satisfy a published no-show or withdrawal rule.
-4. **Moderator decision** ? an authorized reviewer evaluated the case and recorded reasons.
-5. **Authorized publisher assertion** ? a future approved adapter returned a signed/provenance-tagged result.
-6. **Correction** ? a versioned decision superseded a prior resolution.
-7. **Void** ? no competition outcome is applied.
+1. **Mutual confirmation** - one submission confirmed by the opponent.
+2. **Compatible independent submissions** - both players submitted the same normalized outcome.
+3. **Rules-based forfeit** - server-recorded conditions satisfy a published no-show or withdrawal rule.
+4. **Moderator decision** - an authorized reviewer evaluated the case and recorded reasons.
+5. **Authorized publisher assertion** - a future approved adapter returned a signed/provenance-tagged result.
+6. **Correction** - a versioned decision superseded a prior resolution.
+7. **Void** - no competition outcome is applied.
 
-The public UI must label these accurately. ?Verified? alone is too ambiguous.
+The public UI must label these accurately. "Verified" alone is too ambiguous.
 
 ## Match reference
 
@@ -108,7 +108,7 @@ Evidence is supporting material, not automatically conclusive. Images can be edi
 
 ## No-show decisions
 
-?No-show? must distinguish unwillingness, inability, connectivity problems, scheduling failure, and platform outage.
+"No-show" must distinguish unwillingness, inability, connectivity problems, scheduling failure, and platform outage.
 
 ### Willingness signals
 

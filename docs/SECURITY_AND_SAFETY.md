@@ -113,7 +113,7 @@ Controls:
 - emergency escalation;
 - reporter privacy where appropriate.
 
-Do not expose a reporter's private identity to the reported user merely for ?transparency.?
+Do not expose a reporter's private identity to the reported user merely for "transparency."
 
 ## Organizer/moderator abuse
 
@@ -123,7 +123,7 @@ Platform administrators should not perform routine casework with unrestricted to
 
 ## Logging and audit
 
-Operational logs answer ?is the system working?? Audit logs answer ?who changed competition truth??
+Operational logs answer "is the system working?" Audit logs answer "who changed competition truth?"
 
 - Structured operational logs use correlation IDs.
 - Audit events commit with domain changes.

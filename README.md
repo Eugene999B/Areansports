@@ -90,11 +90,15 @@ docs/
   API.md               API conventions and endpoint catalog
   ARCHITECTURE.md      System design and trust boundaries
   DATA_MODEL.md        Entity and lifecycle reference
+  EXECUTION_BACKLOG.md Ordered implementation slices and acceptance gates
+  GHANA_LAUNCH_PLAN.md Closed-pilot readiness and launch gates
   HANDOFF.md           Current state for the next developer or AI
   MATCH_VERIFICATION.md
+  MODERATION_OPERATIONS.md Human review, decisions, sanctions, and appeals
   PRODUCT_REQUIREMENTS.md
   ROADMAP.md
   SECURITY_AND_SAFETY.md
+  TEST_STRATEGY.md     Quality layers, adversarial cases, and release evidence
 ```
 
 ## Getting started
@@ -153,8 +157,12 @@ New contributors and AI agents should read:
 4. [Match Verification](docs/MATCH_VERIFICATION.md)
 5. [Data Model](docs/DATA_MODEL.md)
 6. [API Contract](docs/API.md)
-7. [Roadmap](docs/ROADMAP.md)
-8. [Current Handoff](docs/HANDOFF.md)
+7. [Execution Backlog](docs/EXECUTION_BACKLOG.md)
+8. [Test Strategy](docs/TEST_STRATEGY.md)
+9. [Moderation Operations](docs/MODERATION_OPERATIONS.md)
+10. [Ghana Launch Plan](docs/GHANA_LAUNCH_PLAN.md)
+11. [Roadmap](docs/ROADMAP.md)
+12. [Current Handoff](docs/HANDOFF.md)
 
 ## Contributing and security
 

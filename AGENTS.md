@@ -16,8 +16,12 @@ Before changing code, read:
 4. `docs/MATCH_VERIFICATION.md`
 5. `docs/DATA_MODEL.md`
 6. `docs/API.md`
-7. `docs/ROADMAP.md`
-8. `docs/HANDOFF.md`
+7. `docs/EXECUTION_BACKLOG.md`
+8. `docs/TEST_STRATEGY.md`
+9. `docs/MODERATION_OPERATIONS.md`
+10. `docs/GHANA_LAUNCH_PLAN.md`
+11. `docs/ROADMAP.md`
+12. `docs/HANDOFF.md`
 
 Read relevant ADRs before altering a recorded decision.
 

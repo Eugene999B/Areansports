@@ -4,7 +4,9 @@
 
 **Branch:** `agent/platform-foundation`  
 **Draft PR:** [#1](https://github.com/Eugene999B/Areansports/pull/1)  
-**Workflow:** [CI run 30097444625](https://github.com/Eugene999B/Areansports/actions/runs/30097444625)  
+**Original workflow:** [CI run 30097444625](https://github.com/Eugene999B/Areansports/actions/runs/30097444625)  
+**Latest manual rerun:** [CI run 30097908524](https://github.com/Eugene999B/Areansports/actions/runs/30097908524)  
+**Account support:** GitHub ticket #4599457  
 **Result:** Not executed
 
 GitHub created the workflow run, but the validation job did not start. GitHub reported: "The job was not started because your account is locked due to a billing issue."
@@ -31,7 +33,7 @@ This is an external account blocker, not evidence that the code passed or failed
 
 ### Required next validation
 
-1. Resolve the GitHub billing/account lock.
+1. Resolve GitHub Support ticket #4599457 and confirm the billing/account lock is removed.
 2. Re-run CI.
 3. Perform a clean checkout with Node 22.13+ and pnpm 11.17.
 4. Run `pnpm install` and commit the generated `pnpm-lock.yaml`.

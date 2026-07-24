@@ -1,6 +1,6 @@
 # Ethical engagement and retention
 
-ArenaSports should become a habit because it reliably helps communities compete?not because it manipulates players.
+ArenaSports should become a habit because it reliably helps communities compete, not because it manipulates players.
 
 ## Value loops
 
@@ -30,7 +30,7 @@ Recurring season -> recognizable rivals -> transparent standings -> shareable st
 - share cards that do not expose private data;
 - optional streaks based on fair play/completion, with forgiving pauses;
 - notification preferences and quiet hours;
-- ?take a break? controls and easy opt-out.
+- "take a break" controls and easy opt-out.
 
 ## Prohibited dark patterns
 
@@ -41,7 +41,7 @@ Recurring season -> recognizable rivals -> transparent standings -> shareable st
 - guilt language for inactivity;
 - randomized paid rewards;
 - burying account deletion or notification controls;
-- misleading ?verified? labels;
+- misleading "verified" labels;
 - ranking people by invisible suspicion;
 - making dispute filing intentionally difficult;
 - rewarding harassment or unhealthy volume.

@@ -20,6 +20,8 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 - [x] Architecture and ADRs
 - [x] Data model and API contract
 - [x] Match verification and safety model
+- [x] Execution backlog and test strategy
+- [x] Moderation operations and Ghana closed-pilot plan
 - [x] pnpm monorepo
 - [x] Shared contracts
 - [x] Database schema
@@ -30,7 +32,7 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 
 **Exit:** A contributor can understand the trust boundaries, start services, and run passing checks.
 
-## Phase 1 ? identity and tournament core
+## Phase 1 - identity and tournament core
 
 **Goal:** An organizer can create a free competition and players can join.
 
@@ -50,7 +52,7 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 
 **Exit:** An internal cohort registers and receives deterministic fixtures without manual database edits.
 
-## Phase 2 ? match operations and integrity
+## Phase 2 - match operations and integrity
 
 **Goal:** Players complete matches with transparent deadlines and evidence.
 
@@ -71,7 +73,7 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 
 **Exit:** A tournament completes with every result traceable to a valid resolution path.
 
-## Phase 3 ? competition depth and community
+## Phase 3 - competition depth and community
 
 - Group-to-knockout and double-elimination
 - Seasons, divisions, promotion, and relegation
@@ -84,7 +86,7 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 - Community leaderboards with anti-smurf controls
 - Localization, accessibility, export, and deletion
 
-## Phase 4 ? scale and publisher adapters
+## Phase 4 - scale and publisher adapters
 
 - Authorized publisher adapters behind a stable interface
 - Webhook replay protection and result provenance
@@ -95,7 +97,7 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 - Status page, incident response, and disaster recovery
 - Performance and load testing
 
-## Phase 5 ? sustainable business model
+## Phase 5 - sustainable business model
 
 Potential later features: organizer analytics, branded pages, historical exports, moderation tooling, labeled sponsorships, and voluntary donations.
 

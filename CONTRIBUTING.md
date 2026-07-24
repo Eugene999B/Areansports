@@ -37,10 +37,10 @@ A pull request is not ready merely because it compiles. Consequential rules requ
 
 ## Product language
 
-- **Planned** ? described only.
-- **Scaffolded** ? shape exists but is incomplete.
-- **Implemented** ? working with tests.
-- **Verified** ? tested in a production-like environment.
+- **Planned** - described only.
+- **Scaffolded** - shape exists but is incomplete.
+- **Implemented** - working with tests.
+- **Verified** - tested in a production-like environment.
 
 Do not describe evidence-based verification as publisher-verified.
 

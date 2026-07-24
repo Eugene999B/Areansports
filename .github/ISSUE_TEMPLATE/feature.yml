@@ -31,6 +31,6 @@ body:
       label: Does this introduce entry fees, wagering, wallets, prizes, or payouts?
       options:
         - "No"
-        - "Yes ? this is outside the approved MVP and needs separate review"
+        - "Yes - this is outside the approved MVP and needs separate review"
     validations:
       required: true
