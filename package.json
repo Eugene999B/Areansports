@@ -10,12 +10,13 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "dev": "pnpm --parallel --filter @arenasports/api --filter @arenasports/mobile dev",
-    "dev:api": "pnpm --filter @arenasports/api dev",
+    "prepare:workspace": "pnpm --filter @arenasports/contracts build && pnpm --filter @arenasports/database db:generate",
+    "dev": "pnpm prepare:workspace && pnpm --parallel --filter @arenasports/api --filter @arenasports/mobile dev",
+    "dev:api": "pnpm prepare:workspace && pnpm --filter @arenasports/api dev",
     "dev:mobile": "pnpm --filter @arenasports/mobile dev",
     "build": "pnpm -r --if-present build",
-    "typecheck": "pnpm -r --if-present typecheck",
-    "test": "pnpm -r --if-present test",
+    "typecheck": "pnpm prepare:workspace && pnpm -r --if-present typecheck",
+    "test": "pnpm prepare:workspace && pnpm -r --if-present test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:generate": "pnpm --filter @arenasports/database db:generate",
