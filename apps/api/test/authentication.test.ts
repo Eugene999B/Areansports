@@ -2,7 +2,6 @@ import {
   createPrivateKey,
   generateKeyPairSync,
   sign,
-  type JsonWebKey,
   type KeyObject,
 } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
@@ -11,6 +10,7 @@ import {
   SupabaseJwtVerifier,
   type AccountResolver,
   type ArenaSportsAccount,
+  type VerificationJwk,
 } from '../src/modules/identity/authentication.js';
 
 const nowSeconds = 1_800_000_000;
@@ -18,7 +18,12 @@ const issuer = 'https://project.supabase.co/auth/v1';
 const audience = 'authenticated';
 const keyId = 'test-key';
 const { privateKey, publicKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
-const publicJwk = { ...publicKey.export({ format: 'jwk' }), alg: 'ES256', kid: keyId, use: 'sig' };
+const publicJwk = {
+  ...publicKey.export({ format: 'jwk' }),
+  alg: 'ES256',
+  kid: keyId,
+  use: 'sig',
+} as VerificationJwk;
 
 function encode(value: unknown): string {
   return Buffer.from(JSON.stringify(value)).toString('base64url');
@@ -41,17 +46,20 @@ function createToken(
     email_confirmed_at: '2027-01-15T08:00:00.000Z',
     ...claims,
   });
-  const signature = sign(
-    'sha256',
-    Buffer.from(`${encodedHeader}.${encodedClaims}`, 'ascii'),
-    { key: signingKey, dsaEncoding: 'ieee-p1363' },
-  );
+  const signature = sign('sha256', Buffer.from(`${encodedHeader}.${encodedClaims}`, 'ascii'), {
+    key: signingKey,
+    dsaEncoding: 'ieee-p1363',
+  });
   return `${encodedHeader}.${encodedClaims}.${signature.toString('base64url')}`;
 }
 
-function createVerifier(keys: readonly JsonWebKey[] = [publicJwk]) {
+function createVerifier(keys: readonly VerificationJwk[] = [publicJwk]) {
   return new SupabaseJwtVerifier(
-    { issuer, audiences: [audience], jwksUrl: 'https://project.supabase.co/auth/v1/.well-known/jwks.json' },
+    {
+      issuer,
+      audiences: [audience],
+      jwksUrl: 'https://project.supabase.co/auth/v1/.well-known/jwks.json',
+    },
     async () => keys,
     () => nowSeconds * 1_000,
   );
@@ -107,7 +115,10 @@ describe('BearerAuthenticationService', () => {
   };
 
   it('rejects missing and malformed bearer headers with a stable safe error', async () => {
-    const service = new BearerAuthenticationService(createVerifier(), accountResolver(activeAccount));
+    const service = new BearerAuthenticationService(
+      createVerifier(),
+      accountResolver(activeAccount),
+    );
 
     await expect(service.authenticate(undefined)).rejects.toMatchObject({
       code: 'AUTHENTICATION_REQUIRED',
@@ -133,8 +144,13 @@ describe('BearerAuthenticationService', () => {
   });
 
   it('does not accept provider identity metadata as local authorization', async () => {
-    const service = new BearerAuthenticationService(createVerifier(), accountResolver(activeAccount));
-    const principal = await service.authenticate(`Bearer ${createToken({ role: 'administrator' })}`);
+    const service = new BearerAuthenticationService(
+      createVerifier(),
+      accountResolver(activeAccount),
+    );
+    const principal = await service.authenticate(
+      `Bearer ${createToken({ role: 'administrator' })}`,
+    );
 
     expect(principal.account.roles).toEqual(['PLAYER']);
   });

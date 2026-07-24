@@ -1,4 +1,4 @@
-import { createPublicKey, verify, type JsonWebKey, type KeyObject } from 'node:crypto';
+import { createPublicKey, verify, type KeyObject } from 'node:crypto';
 import { z } from 'zod';
 import { AppError } from '../../errors.js';
 
@@ -41,6 +41,8 @@ const JsonWebKeySchema = z
 
 const JsonWebKeySetSchema = z.object({ keys: z.array(JsonWebKeySchema).max(20) });
 
+export type VerificationJwk = z.input<typeof JsonWebKeySchema>;
+
 export type JwtVerificationConfig = {
   issuer: string;
   audiences: readonly string[];
@@ -81,7 +83,7 @@ export type AuthenticatedPrincipal = {
   account: ArenaSportsAccount;
 };
 
-export type JwksLoader = () => Promise<readonly JsonWebKey[]>;
+export type JwksLoader = () => Promise<readonly VerificationJwk[]>;
 
 type Clock = () => number;
 
@@ -168,7 +170,11 @@ export class SupabaseJwtVerifier implements AuthenticationProvider {
       if (segments.length !== 3) return invalidToken();
 
       const [encodedHeader, encodedClaims, encodedSignature] = segments;
-      if (encodedHeader === undefined || encodedClaims === undefined || encodedSignature === undefined) {
+      if (
+        encodedHeader === undefined ||
+        encodedClaims === undefined ||
+        encodedSignature === undefined
+      ) {
         return invalidToken();
       }
 
@@ -180,7 +186,7 @@ export class SupabaseJwtVerifier implements AuthenticationProvider {
 
       const key = await this.findKey(header.kid, header.alg);
       if (key === null) return invalidToken();
-      const publicKey = createPublicKey({ key: key as JsonWebKey, format: 'jwk' });
+      const publicKey = createPublicKey({ key: key as never, format: 'jwk' });
       const signatureValid = verifySignature(
         header.alg,
         Buffer.from(`${encodedHeader}.${encodedClaims}`, 'ascii'),
@@ -253,7 +259,9 @@ export class BearerAuthenticationService {
     private readonly accounts: AccountResolver,
   ) {}
 
-  public async authenticate(authorizationHeader: string | undefined): Promise<AuthenticatedPrincipal> {
+  public async authenticate(
+    authorizationHeader: string | undefined,
+  ): Promise<AuthenticatedPrincipal> {
     const match = authorizationHeader?.match(/^Bearer ([^\s]+)$/);
     if (match?.[1] === undefined) throw authenticationRequired();
 

@@ -58,7 +58,8 @@ export function readConfig(environment: NodeJS.ProcessEnv = process.env): AppCon
       ? {
           authentication: {
             issuer: parsed.AUTH_ISSUER!,
-            audiences: parsed.AUTH_AUDIENCE!.split(',')
+            audiences: parsed
+              .AUTH_AUDIENCE!.split(',')
               .map((audience) => audience.trim())
               .filter(Boolean),
             jwksUrl: parsed.AUTH_JWKS_URL!,
