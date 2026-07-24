@@ -1,0 +1,25 @@
+{
+  "expo": {
+    "name": "ArenaSports",
+    "slug": "arenasports",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "arenasports",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "android": {
+      "package": "com.arenasports.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#07111F"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.arenasports.app",
+      "supportsTablet": true
+    }
+  }
+}

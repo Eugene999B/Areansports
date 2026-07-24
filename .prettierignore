@@ -1,0 +1,7 @@
+node_modules
+dist
+build
+coverage
+.expo
+packages/database/src/generated
+pnpm-lock.yaml

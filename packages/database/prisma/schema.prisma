@@ -1,0 +1,438 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  runtime             = "nodejs"
+  moduleFormat        = "esm"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum TournamentStatus {
+  DRAFT
+  PUBLISHED
+  REGISTRATION_OPEN
+  REGISTRATION_LOCKED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  ARCHIVED
+}
+
+enum TournamentVisibility {
+  PUBLIC
+  UNLISTED
+  INVITE_ONLY
+  APPROVAL_REQUIRED
+}
+
+enum TournamentFormat {
+  ROUND_ROBIN
+  SINGLE_ELIMINATION
+  GROUP_TO_KNOCKOUT
+  DOUBLE_ELIMINATION
+}
+
+enum RegistrationStatus {
+  PENDING
+  ACCEPTED
+  WAITLISTED
+  REJECTED
+  WITHDRAWN
+  REMOVED
+  LOCKED
+}
+
+enum FixtureStatus {
+  SCHEDULED
+  CHECK_IN_OPEN
+  READY
+  AWAITING_RESULT
+  PENDING_CONFIRMATION
+  DISPUTED
+  UNDER_REVIEW
+  FORFEIT_PENDING
+  FINAL
+  RESCHEDULED
+  VOID
+}
+
+enum SubmissionStatus {
+  PENDING
+  CONFIRMED
+  DISPUTED
+  REPLACED
+  ACCEPTED
+  REJECTED
+}
+
+enum ResolutionSource {
+  MUTUAL_CONFIRMATION
+  COMPATIBLE_SUBMISSIONS
+  RULES_BASED_FORFEIT
+  MODERATOR_DECISION
+  AUTHORIZED_PROVIDER
+  CORRECTION
+  VOID
+}
+
+enum EvidenceStatus {
+  PENDING_UPLOAD
+  SCANNING
+  AVAILABLE
+  QUARANTINED
+  DELETED
+}
+
+enum DisputeStatus {
+  OPEN
+  EVIDENCE_COLLECTION
+  READY_FOR_REVIEW
+  CLAIMED
+  DECIDED
+  APPEALED
+  CLOSED
+}
+
+model User {
+  id             String   @id @default(cuid())
+  handle         String   @unique
+  displayName    String
+  countryCode    String   @db.Char(2)
+  timezone       String
+  status         UserStatus @default(ACTIVE)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  gameProfiles   GameProfile[]
+  organized      Tournament[] @relation("TournamentOrganizer")
+  registrations  TournamentRegistration[]
+  participants   TournamentParticipant[]
+  evidence       Evidence[]
+  openedDisputes Dispute[] @relation("DisputeOpener")
+  reviewCases    Dispute[] @relation("DisputeReviewer")
+
+  @@index([status])
+}
+
+model Game {
+  id             String   @id @default(cuid())
+  slug           String   @unique
+  name           String
+  publisher      String?
+  active         Boolean  @default(true)
+  resultProvider String   @default("EVIDENCE")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  profiles       GameProfile[]
+  tournaments    Tournament[]
+}
+
+model GameProfile {
+  id                 String   @id @default(cuid())
+  userId             String
+  gameId             String
+  platform           String
+  region             String
+  username           String
+  normalizedUsername String
+  verificationState  String   @default("UNVERIFIED")
+  visible            Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user          User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game          Game @relation(fields: [gameId], references: [id], onDelete: Restrict)
+  registrations TournamentRegistration[]
+  participants  TournamentParticipant[]
+
+  @@unique([gameId, platform, region, normalizedUsername])
+  @@index([userId])
+}
+
+model Tournament {
+  id                   String   @id @default(cuid())
+  organizerId          String
+  gameId               String
+  activeRulesetId      String?  @unique
+  title                String
+  slug                 String   @unique
+  description          String   @default("")
+  platform             String
+  region               String
+  timezone             String
+  visibility           TournamentVisibility
+  format               TournamentFormat
+  status               TournamentStatus @default(DRAFT)
+  capacity             Int
+  registrationOpensAt  DateTime
+  registrationClosesAt DateTime
+  startsAt             DateTime
+  completedAt          DateTime?
+  version              Int      @default(1)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  organizer        User @relation("TournamentOrganizer", fields: [organizerId], references: [id], onDelete: Restrict)
+  game             Game @relation(fields: [gameId], references: [id], onDelete: Restrict)
+  activeRuleset    RulesetVersion? @relation("ActiveRuleset", fields: [activeRulesetId], references: [id], onDelete: SetNull)
+  rulesets         RulesetVersion[] @relation("TournamentRulesets")
+  registrations    TournamentRegistration[]
+  participants     TournamentParticipant[]
+  fixtures         Fixture[]
+  disputes         Dispute[]
+
+  @@index([status, startsAt])
+  @@index([gameId, visibility, status])
+  @@index([organizerId])
+}
+
+model RulesetVersion {
+  id               String   @id @default(cuid())
+  tournamentId     String
+  version          Int
+  schemaVersion    Int
+  contentDigest    String
+  rules            Json
+  publishedAt      DateTime?
+  createdAt        DateTime @default(now())
+
+  tournament       Tournament @relation("TournamentRulesets", fields: [tournamentId], references: [id], onDelete: Cascade)
+  activeFor        Tournament? @relation("ActiveRuleset")
+  registrations    TournamentRegistration[]
+  fixtures         Fixture[]
+
+  @@unique([tournamentId, version])
+}
+
+model TournamentRegistration {
+  id                   String   @id @default(cuid())
+  tournamentId         String
+  userId               String
+  gameProfileId        String
+  rulesetVersionId     String
+  status               RegistrationStatus @default(PENDING)
+  eligibilitySnapshot  Json
+  acknowledgedAt       DateTime
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  tournament     Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user           User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  gameProfile    GameProfile @relation(fields: [gameProfileId], references: [id], onDelete: Restrict)
+  rulesetVersion RulesetVersion @relation(fields: [rulesetVersionId], references: [id], onDelete: Restrict)
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId, status])
+}
+
+model TournamentParticipant {
+  id             String   @id @default(cuid())
+  tournamentId   String
+  userId         String
+  gameProfileId  String
+  seed           Int?
+  displaySnapshot Json
+  createdAt      DateTime @default(now())
+
+  tournament     Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  user           User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  gameProfile    GameProfile @relation(fields: [gameProfileId], references: [id], onDelete: Restrict)
+  homeFixtures   Fixture[] @relation("HomeParticipant")
+  awayFixtures   Fixture[] @relation("AwayParticipant")
+  checkIns       MatchCheckIn[]
+  submissions    MatchSubmission[]
+
+  @@unique([tournamentId, userId])
+  @@index([tournamentId, seed])
+}
+
+model Fixture {
+  id                   String   @id @default(cuid())
+  tournamentId         String
+  rulesetVersionId     String
+  homeParticipantId    String?
+  awayParticipantId    String?
+  activeResolutionId   String?  @unique
+  matchReference       String   @unique
+  roundNumber          Int
+  sequence             Int
+  windowOpensAt        DateTime
+  deadlineAt           DateTime
+  status               FixtureStatus @default(SCHEDULED)
+  version              Int      @default(1)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  tournament       Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  rulesetVersion   RulesetVersion @relation(fields: [rulesetVersionId], references: [id], onDelete: Restrict)
+  homeParticipant  TournamentParticipant? @relation("HomeParticipant", fields: [homeParticipantId], references: [id], onDelete: Restrict)
+  awayParticipant  TournamentParticipant? @relation("AwayParticipant", fields: [awayParticipantId], references: [id], onDelete: Restrict)
+  activeResolution MatchResolution? @relation("ActiveResolution", fields: [activeResolutionId], references: [id], onDelete: SetNull)
+  resolutions      MatchResolution[] @relation("FixtureResolutions")
+  checkIns         MatchCheckIn[]
+  submissions      MatchSubmission[]
+  evidence         Evidence[]
+  disputes         Dispute[]
+
+  @@unique([tournamentId, roundNumber, sequence])
+  @@index([tournamentId, status, deadlineAt])
+}
+
+model MatchCheckIn {
+  id             String   @id @default(cuid())
+  fixtureId      String
+  participantId  String
+  fixtureVersion Int
+  idempotencyKey String
+  checkedInAt    DateTime @default(now())
+
+  fixture     Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  participant TournamentParticipant @relation(fields: [participantId], references: [id], onDelete: Restrict)
+
+  @@unique([participantId, fixtureId])
+  @@unique([participantId, idempotencyKey])
+}
+
+model MatchSubmission {
+  id             String   @id @default(cuid())
+  fixtureId      String
+  participantId  String
+  fixtureVersion Int
+  scoreSelf      Int
+  scoreOpponent  Int
+  playedAt       DateTime
+  notes          String   @default("")
+  status         SubmissionStatus @default(PENDING)
+  idempotencyKey String
+  requestDigest  String
+  createdAt      DateTime @default(now())
+
+  fixture     Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  participant TournamentParticipant @relation(fields: [participantId], references: [id], onDelete: Restrict)
+  evidence    Evidence[]
+
+  @@unique([participantId, idempotencyKey])
+  @@index([fixtureId, status])
+}
+
+model MatchResolution {
+  id                String   @id @default(cuid())
+  fixtureId         String
+  supersedesId      String?
+  version           Int
+  source            ResolutionSource
+  homeScore         Int?
+  awayScore         Int?
+  winnerParticipantId String?
+  reasonCode        String
+  explanation       String
+  decisionActorId   String?
+  rulesetDigest     String
+  engineVersion     String
+  finalizedAt       DateTime @default(now())
+
+  fixture       Fixture @relation("FixtureResolutions", fields: [fixtureId], references: [id], onDelete: Cascade)
+  activeFor     Fixture? @relation("ActiveResolution")
+  supersedes    MatchResolution? @relation("ResolutionCorrection", fields: [supersedesId], references: [id], onDelete: Restrict)
+  corrections   MatchResolution[] @relation("ResolutionCorrection")
+
+  @@unique([fixtureId, version])
+  @@index([fixtureId, finalizedAt])
+}
+
+model Evidence {
+  id             String   @id @default(cuid())
+  fixtureId      String
+  submissionId   String?
+  uploaderId     String
+  objectKey      String   @unique
+  mediaType      String
+  byteSize       Int
+  digest         String?
+  status         EvidenceStatus @default(PENDING_UPLOAD)
+  capturedAt     DateTime?
+  uploadedAt     DateTime?
+  retainUntil    DateTime?
+  deletedAt      DateTime?
+  createdAt      DateTime @default(now())
+
+  fixture     Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  submission  MatchSubmission? @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+  uploader    User @relation(fields: [uploaderId], references: [id], onDelete: Restrict)
+
+  @@index([fixtureId, status])
+  @@index([digest])
+  @@index([retainUntil, status])
+}
+
+model Dispute {
+  id                 String   @id @default(cuid())
+  tournamentId       String
+  fixtureId          String
+  openerId           String
+  assignedReviewerId String?
+  category           String
+  statement          String
+  status             DisputeStatus @default(OPEN)
+  priority           Int      @default(0)
+  version            Int      @default(1)
+  decision           Json?
+  openedAt           DateTime @default(now())
+  decidedAt          DateTime?
+  closedAt           DateTime?
+  updatedAt          DateTime @updatedAt
+
+  tournament       Tournament @relation(fields: [tournamentId], references: [id], onDelete: Cascade)
+  fixture          Fixture @relation(fields: [fixtureId], references: [id], onDelete: Cascade)
+  opener           User @relation("DisputeOpener", fields: [openerId], references: [id], onDelete: Restrict)
+  assignedReviewer User? @relation("DisputeReviewer", fields: [assignedReviewerId], references: [id], onDelete: SetNull)
+
+  @@index([status, priority, openedAt])
+  @@index([tournamentId, status])
+}
+
+model AuditEvent {
+  id             String   @id @default(cuid())
+  actorType      String
+  actorId        String?
+  action         String
+  targetType     String
+  targetId       String
+  tournamentId   String?
+  fixtureId      String?
+  correlationId  String
+  visibility     String
+  metadata       Json
+  occurredAt     DateTime @default(now())
+
+  @@index([targetType, targetId, occurredAt])
+  @@index([tournamentId, occurredAt])
+  @@index([fixtureId, occurredAt])
+  @@index([correlationId])
+}
+
+model OutboxEvent {
+  id            String   @id @default(cuid())
+  eventType     String
+  aggregateType String
+  aggregateId   String
+  payload       Json
+  attempts      Int      @default(0)
+  availableAt   DateTime @default(now())
+  processedAt   DateTime?
+  failedAt      DateTime?
+  lastErrorCode String?
+  createdAt     DateTime @default(now())
+
+  @@index([processedAt, availableAt])
+}

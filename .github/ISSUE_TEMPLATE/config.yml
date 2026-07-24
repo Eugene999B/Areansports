@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/Eugene999B/Areansports/security
+    about: Follow SECURITY.md and report sensitive vulnerabilities privately.

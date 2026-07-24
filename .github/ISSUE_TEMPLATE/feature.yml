@@ -1,0 +1,36 @@
+name: Feature proposal
+description: Propose a focused improvement aligned with the free MVP.
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Player or organizer problem
+      description: Describe the problem before proposing the interface.
+    validations:
+      required: true
+  - type: textarea
+    id: outcome
+    attributes:
+      label: Desired outcome
+      description: What should become possible, and how will we know it worked?
+    validations:
+      required: true
+  - type: textarea
+    id: fairness
+    attributes:
+      label: Fairness and safety
+      description: How could this be abused or create unfair outcomes?
+    validations:
+      required: true
+  - type: dropdown
+    id: money
+    attributes:
+      label: Does this introduce entry fees, wagering, wallets, prizes, or payouts?
+      options:
+        - 'No'
+        - 'Yes - this is outside the approved MVP and needs separate review'
+    validations:
+      required: true
