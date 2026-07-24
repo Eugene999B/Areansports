@@ -9,6 +9,7 @@
 **Result:** Passed
 
 The authentication-provider ADR, shared identity/session contracts, contract export, and four new identity tests passed frozen installation, formatting, Prisma validation, typecheck, all tests, all builds, Android export, and compiled API startup. No Supabase project or secret was created, and provider persistence/JWT verification remain unimplemented.
+
 ## 2026-07-24 foundation branch
 
 **Branch:** `agent/platform-foundation`  

@@ -71,20 +71,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Format handoff documents
-        run: pnpm exec prettier README.md docs/HANDOFF.md docs/VALIDATION.md --write
-
-      - name: Preserve formatted handoff documents
-        uses: actions/upload-artifact@v6
-        with:
-          name: formatted-handoff-${{ github.run_id }}
-          path: |
-            README.md
-            docs/HANDOFF.md
-            docs/VALIDATION.md
-          if-no-files-found: error
-          retention-days: 1
-
       - name: Check formatting
         run: pnpm format:check
 

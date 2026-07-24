@@ -65,6 +65,7 @@ Validation evidence:
 - Push CI passed on the first AS-02 commit: [workflow 30112009004](https://github.com/Eugene999B/Areansports/actions/runs/30112009004).
 
 **First unfinished task:** add provider identity, role assignment, and session metadata models with a reviewed Prisma migration. After that, implement JWT/JWKS verification and negative security tests before adding mobile sign-in screens.
+
 ### Current slice: AS-02 identity and sessions
 
 The next contributor should not jump directly to brackets, evidence, or social features. Continue in dependency order:

@@ -49,11 +49,11 @@ This branch should contain durable documentation, workspace tooling, database sc
 3. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
 4. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
 5. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.
-4. Replace the in-memory tournament repository with PostgreSQL and implement versioned tournament publication.
-5. Add registration, waitlists, rules acknowledgement, and deterministic fixtures.
-6. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
-7. Configure a staging environment and Android internal testing.
-8. Run a closed Ghana community beta with documented moderation and support operations.
+6. Replace the in-memory tournament repository with PostgreSQL and implement versioned tournament publication.
+7. Add registration, waitlists, rules acknowledgement, and deterministic fixtures.
+8. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
+9. Configure a staging environment and Android internal testing.
+10. Run a closed Ghana community beta with documented moderation and support operations.
 
 ## Known blockers and risks
 
@@ -93,6 +93,7 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Added identity, role, profile, session, and handle-normalization contracts plus four tests.
 - Passed the full push CI gate on workflow 30112009004.
 - Stopped before persistence/JWT integration; the exact next task is recorded above.
+
 ### 2026-07-24 - foundation validation completed
 
 - Resolved pnpm dependency-build approval and TypeScript 7 compatibility failures.
