@@ -16,6 +16,16 @@ enum UserStatus {
   DELETED
 }
 
+enum AuthProvider {
+  SUPABASE
+}
+
+enum UserRole {
+  PLAYER
+  ORGANIZER
+  MODERATOR
+  ADMINISTRATOR
+}
 enum TournamentStatus {
   DRAFT
   PUBLISHED
@@ -105,13 +115,19 @@ enum DisputeStatus {
 model User {
   id             String   @id @default(cuid())
   handle         String   @unique
+  normalizedHandle String @unique
   displayName    String
   countryCode    String   @db.Char(2)
   timezone       String
   status         UserStatus @default(ACTIVE)
+  notificationPreferences Json @default("{}")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
+  authIdentities AuthIdentity[]
+  roleAssignments UserRoleAssignment[] @relation("RoleHolder")
+  roleGrants      UserRoleAssignment[] @relation("RoleAssigner")
+  sessions        UserSession[]
   gameProfiles   GameProfile[]
   organized      Tournament[] @relation("TournamentOrganizer")
   registrations  TournamentRegistration[]
@@ -123,6 +139,58 @@ model User {
   @@index([status])
 }
 
+model AuthIdentity {
+  id             String       @id @default(cuid())
+  userId         String
+  provider       AuthProvider
+  subject        String
+  emailVerified  Boolean      @default(false)
+  phoneVerified  Boolean      @default(false)
+  lastSeenAt     DateTime?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions UserSession[]
+
+  @@unique([provider, subject])
+  @@index([userId])
+}
+
+model UserRoleAssignment {
+  id           String   @id @default(cuid())
+  userId       String
+  role         UserRole
+  assignedById String?
+  reasonCode   String
+  assignedAt   DateTime @default(now())
+  revokedAt    DateTime?
+
+  user       User  @relation("RoleHolder", fields: [userId], references: [id], onDelete: Cascade)
+  assignedBy User? @relation("RoleAssigner", fields: [assignedById], references: [id], onDelete: SetNull)
+
+  @@index([userId, role, revokedAt])
+  @@index([assignedById, assignedAt])
+}
+
+model UserSession {
+  id                    String   @id @default(cuid())
+  userId                String
+  authIdentityId        String
+  providerSessionIdHash String   @unique
+  deviceLabel           String?
+  createdAt             DateTime @default(now())
+  lastSeenAt            DateTime @default(now())
+  expiresAt             DateTime
+  revokedAt             DateTime?
+  revokedReasonCode     String?
+
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  authIdentity AuthIdentity @relation(fields: [authIdentityId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, expiresAt])
+  @@index([authIdentityId])
+}
 model Game {
   id             String   @id @default(cuid())
   slug           String   @unique

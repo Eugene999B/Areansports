@@ -1,5 +1,35 @@
 # Validation record
 
+## 2026-07-24 AS-02 authentication boundary checkpoint
+
+**Branch:** `agent/identity-sessions`  
+**Draft PR:** [#3](https://github.com/Eugene999B/Areansports/pull/3)  
+**Validated commit:** `fe9cb94896015079736cc378931ca26ab5de2531`  
+**Push CI:** [run 30114913020](https://github.com/Eugene999B/Areansports/actions/runs/30114913020)  
+**Pull-request CI:** [run 30114915564](https://github.com/Eugene999B/Areansports/actions/runs/30114915564)  
+**Result:** Passed
+
+The provider-neutral authentication boundary verifies asymmetric `RS256`, `ES256`, and `EdDSA` JWT signatures using constrained JWKS keys. It enforces exact issuer, audience allowlists, expiry, not-before, issued-at clock tolerance, token size/shape limits, bearer syntax, and `ACTIVE` ArenaSports account status. Provider claims never grant ArenaSports roles.
+
+Negative coverage rejects missing or malformed authorization, expired/future tokens, wrong issuer or audience, unknown keys, unsupported algorithms, forged signatures, suspended/deleted accounts, and provider-role injection. Production configuration fails closed unless issuer, audiences, and HTTPS JWKS URL are configured together. JWKS retrieval is bounded, HTTPS-only, cached, and refreshed conservatively.
+
+Both workflows passed frozen installation, formatting, Prisma validation, migration deployment to empty PostgreSQL, typecheck, six test files with twenty-eight tests, all builds including Android export, and compiled API smoke testing. No live Supabase project, credential, secret, account provisioning route, or `/v1/me` integration exists yet.
+
+## 2026-07-24 AS-02 identity and migration checkpoint
+
+**Branch:** `agent/identity-sessions`  
+**Draft PR:** [#3](https://github.com/Eugene999B/Areansports/pull/3)  
+**Validated commit:** `bfddbdaa4624b211ec4eaea5ae965aa880125bf2`  
+**Push CI:** [run 30113466310](https://github.com/Eugene999B/Areansports/actions/runs/30113466310)  
+**Pull-request CI:** [run 30113468066](https://github.com/Eugene999B/Areansports/actions/runs/30113468066)  
+**Result:** Passed
+
+ADR 0004, provider-neutral identity/session contracts, four identity tests, and Prisma persistence for accounts, provider subjects, roles, and sessions are implemented. The cloud-generated baseline migration is committed at `packages/database/prisma/migrations/20260724173000_initial/migration.sql` with a PostgreSQL migration lock.
+
+Both final workflows installed from the frozen lockfile, passed formatting and Prisma validation, deployed the committed migration to an empty PostgreSQL 18 database, passed typecheck and all tests, built all packages including the Android export, and smoke-tested the compiled API.
+
+This is a new pre-production database history, so `normalizedHandle` has no legacy rows to backfill. Destructive rollback is permitted only for disposable development databases; once shared or production data exists, corrections must use reviewed forward migrations. No Supabase project, credential, or secret was created. JWT/JWKS verification and live provider integration remain unimplemented.
+
 ## 2026-07-24 foundation branch
 
 **Branch:** `agent/platform-foundation`  

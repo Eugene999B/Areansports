@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import { z } from 'zod';
+import type { JwtVerificationConfig } from './modules/identity/authentication.js';
 
 const BooleanStringSchema = z
   .enum(['true', 'false'])
@@ -13,6 +14,9 @@ const ConfigSchema = z.object({
   LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
   CORS_ORIGINS: z.string().default('http://localhost:8081,http://localhost:19006'),
   ENABLE_DEMO_AUTH: BooleanStringSchema,
+  AUTH_ISSUER: z.string().url().optional(),
+  AUTH_AUDIENCE: z.string().optional(),
+  AUTH_JWKS_URL: z.string().url().optional(),
 });
 
 export type AppConfig = {
@@ -22,6 +26,7 @@ export type AppConfig = {
   logLevel: 'fatal' | 'error' | 'warn' | 'info' | 'debug' | 'trace' | 'silent';
   corsOrigins: string[];
   enableDemoAuth: boolean;
+  authentication?: JwtVerificationConfig;
 };
 
 export function readConfig(environment: NodeJS.ProcessEnv = process.env): AppConfig {
@@ -29,6 +34,15 @@ export function readConfig(environment: NodeJS.ProcessEnv = process.env): AppCon
 
   if (parsed.NODE_ENV === 'production' && parsed.ENABLE_DEMO_AUTH) {
     throw new Error('ENABLE_DEMO_AUTH cannot be enabled in production.');
+  }
+
+  const authValues = [parsed.AUTH_ISSUER, parsed.AUTH_AUDIENCE, parsed.AUTH_JWKS_URL];
+  const authConfigured = authValues.some((value) => value !== undefined && value.length > 0);
+  if (authConfigured && authValues.some((value) => value === undefined || value.length === 0)) {
+    throw new Error('AUTH_ISSUER, AUTH_AUDIENCE, and AUTH_JWKS_URL must be configured together.');
+  }
+  if (parsed.NODE_ENV === 'production' && !authConfigured) {
+    throw new Error('Authentication verification must be configured in production.');
   }
 
   return {
@@ -40,5 +54,17 @@ export function readConfig(environment: NodeJS.ProcessEnv = process.env): AppCon
       .map((origin) => origin.trim())
       .filter(Boolean),
     enableDemoAuth: parsed.ENABLE_DEMO_AUTH,
+    ...(authConfigured
+      ? {
+          authentication: {
+            issuer: parsed.AUTH_ISSUER!,
+            audiences: parsed
+              .AUTH_AUDIENCE!.split(',')
+              .map((audience) => audience.trim())
+              .filter(Boolean),
+            jwksUrl: parsed.AUTH_JWKS_URL!,
+          },
+        }
+      : {}),
   };
 }
