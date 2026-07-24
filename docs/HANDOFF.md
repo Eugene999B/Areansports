@@ -40,11 +40,12 @@ This branch should contain durable documentation, workspace tooling, database sc
 - The exact validation evidence is recorded in `docs/VALIDATION.md`.
 - Draft pull request [#3](https://github.com/Eugene999B/Areansports/pull/3) tracks AS-02 on gent/identity-sessions.
 - ADR 0004 selects Supabase Auth; provider-neutral identity/session contracts and four tests are implemented and CI-validated.
+- Prisma persistence now includes normalized handles, notification preferences, provider identities, revocable role assignments, and hashed provider-session metadata.
 - No Supabase project, production credentials, provider integration, staging environment, or mobile-store release exists yet.
 
 ## Next tasks in priority order
 
-1. Add provider identity, role assignment, and session metadata persistence with a reviewed Prisma migration.
+1. Generate and review a Prisma migration for the identity schema, including safe `normalizedHandle` backfill and rollback notes.
 2. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
 3. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
 4. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
@@ -92,7 +93,7 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Accepted ADR 0004: Supabase Auth for the pilot behind an ArenaSports provider adapter.
 - Added identity, role, profile, session, and handle-normalization contracts plus four tests.
 - Passed the full push CI gate on workflow 30112009004.
-- Stopped before persistence/JWT integration; the exact next task is recorded above.
+- Added the identity persistence schema after this checkpoint; migration generation and JWT integration are next.
 
 ### 2026-07-24 - foundation validation completed
 

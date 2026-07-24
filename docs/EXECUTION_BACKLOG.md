@@ -53,7 +53,7 @@ Acceptance:
 
 **Outcome:** A player can create an ArenaSports account, sign in, sign out, and recover access.
 
-**Status:** In progress. Provider decision, provider boundary, shared identity/session contracts, normalized handle rules, and four contract tests were completed on 2026-07-24. Persistence and JWT integration are next.
+**Status:** In progress. Provider decision, provider boundary, shared identity/session contracts, four contract tests, and the Prisma identity persistence schema were completed on 2026-07-24. Migration generation and JWT integration are next.
 
 Deliverables:
 

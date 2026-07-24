@@ -4,11 +4,11 @@
 
 **Branch:** `agent/identity-sessions`  
 **Draft PR:** [#3](https://github.com/Eugene999B/Areansports/pull/3)  
-**Validated commit:** `efedf6b06412d51f5be281975f9025906c9bf37c`  
-**Push CI:** [run 30112009004](https://github.com/Eugene999B/Areansports/actions/runs/30112009004)  
+**Validated commit:** `6ccc82b7cd93e9f2fb28b3cbdcce61b607525103`  
+**Push CI:** [run 30112894387](https://github.com/Eugene999B/Areansports/actions/runs/30112894387)  
 **Result:** Passed
 
-The authentication-provider ADR, shared identity/session contracts, contract export, and four new identity tests passed frozen installation, formatting, Prisma validation, typecheck, all tests, all builds, Android export, and compiled API startup. No Supabase project or secret was created, and provider persistence/JWT verification remain unimplemented.
+The authentication-provider ADR, shared identity/session contracts, four identity tests, and Prisma persistence schema passed frozen installation, formatting, Prisma validation, typecheck, all tests, all builds, Android export, and compiled API startup. No Supabase project or secret was created. Migration generation, JWT verification, and live provider integration remain unimplemented.
 
 ## 2026-07-24 foundation branch
 

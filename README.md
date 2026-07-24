@@ -62,9 +62,10 @@ Validation evidence:
 - Verified email is first; Google waits for final Android identifiers; phone/SMS waits for cost and abuse approval.
 - Shared contracts now define roles, account states, profiles, profile updates, session summaries, and normalized handles.
 - Four identity tests cover normalization, ambiguous-character rejection, empty updates, and separation of provider identity from ArenaSports roles.
+- Prisma now models normalized handles, notification preferences, Supabase subject mappings, revocable role grants, and hashed provider-session metadata without storing provider tokens or passwords.
 - Push CI passed on the first AS-02 commit: [workflow 30112009004](https://github.com/Eugene999B/Areansports/actions/runs/30112009004).
 
-**First unfinished task:** add provider identity, role assignment, and session metadata models with a reviewed Prisma migration. After that, implement JWT/JWKS verification and negative security tests before adding mobile sign-in screens.
+**First unfinished task:** generate and review the Prisma migration for the new identity schema, including safe backfill behavior for `normalizedHandle`. After that, implement JWT/JWKS verification and negative security tests before adding mobile sign-in screens.
 
 ### Current slice: AS-02 identity and sessions
 
