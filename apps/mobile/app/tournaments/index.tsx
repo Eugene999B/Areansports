@@ -1,12 +1,6 @@
 import { Link } from 'expo-router';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   ApiClientError,
   fetchPublicTournaments,
@@ -32,12 +26,9 @@ function TournamentCard({ tournament }: { tournament: TournamentSummary }) {
         </View>
         <Text style={styles.cardTitle}>{tournament.title}</Text>
         <Text style={styles.meta}>
-          {tournament.platform} ? {tournament.region} ?{' '}
-          {tournament.format.replaceAll('_', ' ')}
+          {tournament.platform} ? {tournament.region} ? {tournament.format.replaceAll('_', ' ')}
         </Text>
-        <Text style={styles.starts}>
-          Starts {new Date(tournament.startsAt).toLocaleString()}
-        </Text>
+        <Text style={styles.starts}>Starts {new Date(tournament.startsAt).toLocaleString()}</Text>
       </Pressable>
     </Link>
   );
@@ -72,8 +63,7 @@ export default function TournamentDiscoveryScreen() {
     <Screen>
       <Text style={styles.heading}>Open competitions</Text>
       <Text style={styles.intro}>
-        Public tournaments that match your game, region, and schedule will appear
-        here.
+        Public tournaments that match your game, region, and schedule will appear here.
       </Text>
 
       {loading ? (
@@ -92,14 +82,12 @@ export default function TournamentDiscoveryScreen() {
         <View style={styles.center}>
           <Text style={styles.emptyTitle}>No public tournaments yet</Text>
           <Text style={styles.muted}>
-            The foundation API is connected, but no organizer has created a public
-            draft in this environment.
+            The foundation API is connected, but no organizer has created a public draft in this
+            environment.
           </Text>
         </View>
       ) : (
-        items.map((tournament) => (
-          <TournamentCard key={tournament.id} tournament={tournament} />
-        ))
+        items.map((tournament) => <TournamentCard key={tournament.id} tournament={tournament} />)
       )}
     </Screen>
   );

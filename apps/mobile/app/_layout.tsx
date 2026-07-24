@@ -15,18 +15,9 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="tournaments/index"
-          options={{ title: 'Find tournaments' }}
-        />
-        <Stack.Screen
-          name="tournaments/[id]"
-          options={{ title: 'Tournament' }}
-        />
-        <Stack.Screen
-          name="create-tournament"
-          options={{ title: 'Create tournament' }}
-        />
+        <Stack.Screen name="tournaments/index" options={{ title: 'Find tournaments' }} />
+        <Stack.Screen name="tournaments/[id]" options={{ title: 'Tournament' }} />
+        <Stack.Screen name="create-tournament" options={{ title: 'Create tournament' }} />
       </Stack>
     </SafeAreaProvider>
   );

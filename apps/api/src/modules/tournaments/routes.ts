@@ -8,10 +8,7 @@ type TournamentRoutesOptions = {
   enableDemoAuth: boolean;
 };
 
-function resolveActorId(
-  header: string | string[] | undefined,
-  enableDemoAuth: boolean,
-): string {
+function resolveActorId(header: string | string[] | undefined, enableDemoAuth: boolean): string {
   if (!enableDemoAuth) {
     throw new AppError(
       'AUTHENTICATION_REQUIRED',
@@ -50,13 +47,9 @@ export const tournamentRoutes: FastifyPluginAsync<TournamentRoutesOptions> = asy
     const result = CreateTournamentSchema.safeParse(request.body);
 
     if (!result.success) {
-      throw new AppError(
-        'VALIDATION_FAILED',
-        'Tournament input is invalid.',
-        400,
-        false,
-        { issues: result.error.issues },
-      );
+      throw new AppError('VALIDATION_FAILED', 'Tournament input is invalid.', 400, false, {
+        issues: result.error.issues,
+      });
     }
 
     const tournament = await options.service.createDraft(actorId, result.data);

@@ -11,17 +11,15 @@ export default function CreateTournamentScreen() {
       <StatusPill label="PLANNED" tone="warning" />
       <Text style={styles.title}>Build a competition people can trust.</Text>
       <Text style={styles.body}>
-        The organizer flow will guide you through game, format, visibility,
-        registration, match windows, scoring, evidence, no-show policy, and a
-        final rules preview before publication.
+        The organizer flow will guide you through game, format, visibility, registration, match
+        windows, scoring, evidence, no-show policy, and a final rules preview before publication.
       </Text>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>Why this is not a quick form</Text>
         <Text style={styles.body}>
-          Published rules become the competition contract. ArenaSports will
-          validate dates, capacity, tie-breakers, evidence requirements, and
-          organizer powers before anyone joins.
+          Published rules become the competition contract. ArenaSports will validate dates,
+          capacity, tie-breakers, evidence requirements, and organizer powers before anyone joins.
         </Text>
       </View>
 

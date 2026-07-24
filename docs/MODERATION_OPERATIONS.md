@@ -80,12 +80,12 @@ Free-form statements are length-limited and sanitized. Private identities are no
 
 ## Priority model
 
-| Priority | Examples | Initial operating target |
-| --- | --- | --- |
-| P0 Critical | credible immediate danger, child sexual exploitation concern, active credential/evidence breach | immediate containment and senior escalation |
-| P1 High | doxxing, credible threat, severe harassment, large tournament integrity incident | same operating day |
-| P2 Normal | disputed result, no-show claim, organizer rule complaint | before the next affected competition dependency where feasible |
-| P3 Low | non-urgent conduct pattern, profile/content concern | queued review |
+| Priority    | Examples                                                                                        | Initial operating target                                       |
+| ----------- | ----------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| P0 Critical | credible immediate danger, child sexual exploitation concern, active credential/evidence breach | immediate containment and senior escalation                    |
+| P1 High     | doxxing, credible threat, severe harassment, large tournament integrity incident                | same operating day                                             |
+| P2 Normal   | disputed result, no-show claim, organizer rule complaint                                        | before the next affected competition dependency where feasible |
+| P3 Low      | non-urgent conduct pattern, profile/content concern                                             | queued review                                                  |
 
 These are internal targets, not public guarantees. Staffing and escalation must be defined before launch.
 

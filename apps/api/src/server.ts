@@ -60,8 +60,7 @@ export async function buildServer(options: BuildServerOptions): Promise<FastifyI
   });
 
   const tournamentService =
-    options.tournamentService ??
-    new TournamentService(new InMemoryTournamentRepository());
+    options.tournamentService ?? new TournamentService(new InMemoryTournamentRepository());
 
   await app.register(healthRoutes, { prefix: '/health' });
   await app.register(tournamentRoutes, {

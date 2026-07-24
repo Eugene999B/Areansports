@@ -17,9 +17,6 @@ describe('readConfig', () => {
       CORS_ORIGINS: 'https://one.example, https://two.example',
     });
 
-    expect(config.corsOrigins).toEqual([
-      'https://one.example',
-      'https://two.example',
-    ]);
+    expect(config.corsOrigins).toEqual(['https://one.example', 'https://two.example']);
   });
 });

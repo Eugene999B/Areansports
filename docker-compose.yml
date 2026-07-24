@@ -6,11 +6,11 @@ services:
       POSTGRES_USER: arenasports
       POSTGRES_PASSWORD: arenasports
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - arenasports_postgres:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U arenasports -d arenasports"]
+      test: ['CMD-SHELL', 'pg_isready -U arenasports -d arenasports']
       interval: 5s
       timeout: 5s
       retries: 10
@@ -18,12 +18,12 @@ services:
   redis:
     image: redis:8-alpine
     ports:
-      - "6379:6379"
-    command: ["redis-server", "--appendonly", "yes"]
+      - '6379:6379'
+    command: ['redis-server', '--appendonly', 'yes']
     volumes:
       - arenasports_redis:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ['CMD', 'redis-cli', 'ping']
       interval: 5s
       timeout: 5s
       retries: 10

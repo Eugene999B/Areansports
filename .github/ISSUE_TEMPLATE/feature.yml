@@ -1,6 +1,6 @@
 name: Feature proposal
 description: Propose a focused improvement aligned with the free MVP.
-title: "[Feature]: "
+title: '[Feature]: '
 labels:
   - enhancement
 body:
@@ -30,7 +30,7 @@ body:
     attributes:
       label: Does this introduce entry fees, wagering, wallets, prizes, or payouts?
       options:
-        - "No"
-        - "Yes - this is outside the approved MVP and needs separate review"
+        - 'No'
+        - 'Yes - this is outside the approved MVP and needs separate review'
     validations:
       required: true

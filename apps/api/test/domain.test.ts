@@ -7,9 +7,7 @@ describe('tournament state policy', () => {
   });
 
   it('rejects skipping directly from draft to in progress', () => {
-    expect(() => assertTournamentTransition('DRAFT', 'IN_PROGRESS')).toThrow(
-      /cannot move/,
-    );
+    expect(() => assertTournamentTransition('DRAFT', 'IN_PROGRESS')).toThrow(/cannot move/);
   });
 
   it('keeps archived tournaments terminal', () => {

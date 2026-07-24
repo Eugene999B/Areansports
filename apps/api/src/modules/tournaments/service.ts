@@ -1,8 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import type {
-  CreateTournamentInput,
-  TournamentSummary,
-} from '@arenasports/contracts';
+import type { CreateTournamentInput, TournamentSummary } from '@arenasports/contracts';
 import type { TournamentRepository } from './repository.js';
 
 export class TournamentService {

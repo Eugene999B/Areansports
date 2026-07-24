@@ -6,11 +6,7 @@ export type TournamentSummary = {
   region: string;
   timezone: string;
   visibility: 'PUBLIC' | 'UNLISTED' | 'INVITE_ONLY' | 'APPROVAL_REQUIRED';
-  format:
-    | 'ROUND_ROBIN'
-    | 'SINGLE_ELIMINATION'
-    | 'GROUP_TO_KNOCKOUT'
-    | 'DOUBLE_ELIMINATION';
+  format: 'ROUND_ROBIN' | 'SINGLE_ELIMINATION' | 'GROUP_TO_KNOCKOUT' | 'DOUBLE_ELIMINATION';
   status: string;
   capacity: number;
   acceptedParticipants: number;
@@ -22,9 +18,7 @@ type TournamentListResponse = {
   data: TournamentSummary[];
 };
 
-const API_URL =
-  process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '') ??
-  'http://10.0.2.2:4000/v1';
+const API_URL = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '') ?? 'http://10.0.2.2:4000/v1';
 
 export class ApiClientError extends Error {
   public constructor(
@@ -36,9 +30,7 @@ export class ApiClientError extends Error {
   }
 }
 
-export async function fetchPublicTournaments(
-  signal?: AbortSignal,
-): Promise<TournamentSummary[]> {
+export async function fetchPublicTournaments(signal?: AbortSignal): Promise<TournamentSummary[]> {
   try {
     const response = await fetch(`${API_URL}/tournaments`, {
       headers: { Accept: 'application/json' },

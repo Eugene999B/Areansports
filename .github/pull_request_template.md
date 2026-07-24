@@ -4,7 +4,7 @@ What user or operational problem does this solve?
 
 ## Changes
 
-- 
+-
 
 ## Integrity, security, and privacy
 
@@ -38,4 +38,4 @@ Commands/results:
 
 ## Limitations and follow-up
 
-- 
+-

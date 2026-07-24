@@ -12,9 +12,7 @@ export default function TournamentDetailScreen() {
     <Screen>
       <StatusPill label="DETAIL FOUNDATION" tone="warning" />
       <Text style={styles.title}>Tournament details</Text>
-      <Text style={styles.muted}>
-        Tournament ID: {id ?? 'unknown'}
-      </Text>
+      <Text style={styles.muted}>Tournament ID: {id ?? 'unknown'}</Text>
 
       <View style={styles.card}>
         <Text style={styles.cardTitle}>What will appear here</Text>
@@ -25,16 +23,11 @@ export default function TournamentDetailScreen() {
         <Text style={styles.line}>? Fixtures, standings, and dispute policy</Text>
       </View>
 
-      <PrimaryButton
-        label="Registration coming next"
-        disabled
-        onPress={() => undefined}
-      />
+      <PrimaryButton label="Registration coming next" disabled onPress={() => undefined} />
 
       <Text style={styles.notice}>
-        This screen intentionally does not pretend registration is implemented.
-        Authentication and persistent tournament details are the next vertical
-        slice.
+        This screen intentionally does not pretend registration is implemented. Authentication and
+        persistent tournament details are the next vertical slice.
       </Text>
     </Screen>
   );

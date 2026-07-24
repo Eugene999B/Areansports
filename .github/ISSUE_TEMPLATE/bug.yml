@@ -1,6 +1,6 @@
 name: Bug report
 description: Report a reproducible ArenaSports defect without private data.
-title: "[Bug]: "
+title: '[Bug]: '
 labels:
   - bug
 body:
@@ -41,8 +41,8 @@ body:
     attributes:
       label: Does this affect results, standings, evidence, permissions, or disputes?
       options:
-        - "No"
-        - "Yes"
-        - "Unsure"
+        - 'No'
+        - 'Yes'
+        - 'Unsure'
     validations:
       required: true

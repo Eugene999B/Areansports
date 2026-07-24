@@ -13,16 +13,16 @@ ArenaSports tests protect competition truth, player safety, and recoverability. 
 
 ## Test layers
 
-| Layer | Purpose | Required examples |
-| --- | --- | --- |
-| Schema/contract | Reject malformed or incompatible inputs | Zod request/response fixtures, error envelopes, enum compatibility |
-| Domain unit | Prove pure competition rules | transitions, scoring, tie-breaks, no-show policy, result normalization |
-| Repository integration | Prove database constraints and transactions | capacity races, unique registration, version conflicts, outbox atomicity |
-| API integration | Prove authentication, authorization, idempotency, and HTTP behavior | role matrix, duplicate keys, stale versions, safe errors |
-| Mobile component | Prove visible states and accessible actions | loading, empty, error, offline, disabled, screen-reader labels |
-| End-to-end | Prove complete user outcomes | create, publish, join, fixture, submit, confirm, finalize |
-| Operational | Prove deployment and recovery | migrations, backup restore, secret/config validation, rollback drill |
-| Security/adversarial | Prove abuse resistance | IDOR, privilege escalation, forged evidence ownership, replay, rate limits |
+| Layer                  | Purpose                                                             | Required examples                                                          |
+| ---------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Schema/contract        | Reject malformed or incompatible inputs                             | Zod request/response fixtures, error envelopes, enum compatibility         |
+| Domain unit            | Prove pure competition rules                                        | transitions, scoring, tie-breaks, no-show policy, result normalization     |
+| Repository integration | Prove database constraints and transactions                         | capacity races, unique registration, version conflicts, outbox atomicity   |
+| API integration        | Prove authentication, authorization, idempotency, and HTTP behavior | role matrix, duplicate keys, stale versions, safe errors                   |
+| Mobile component       | Prove visible states and accessible actions                         | loading, empty, error, offline, disabled, screen-reader labels             |
+| End-to-end             | Prove complete user outcomes                                        | create, publish, join, fixture, submit, confirm, finalize                  |
+| Operational            | Prove deployment and recovery                                       | migrations, backup restore, secret/config validation, rollback drill       |
+| Security/adversarial   | Prove abuse resistance                                              | IDOR, privilege escalation, forged evidence ownership, replay, rate limits |
 
 The test pyramid should be broad at the pure-domain layer, focused at database/API integration, and small but high-value at end-to-end.
 
@@ -221,13 +221,13 @@ Each release candidate records:
 
 ## Defect severity
 
-| Severity | Meaning | Release effect |
-| --- | --- | --- |
-| S0 | account compromise, evidence exposure, arbitrary competition-truth change | stop testing, contain, investigate |
-| S1 | incorrect result/standings, auth bypass, unrecoverable data loss | block release |
-| S2 | major workflow unavailable with a safe workaround | release only with explicit owner decision |
-| S3 | limited usability or presentation issue | may defer with tracked issue |
-| S4 | cosmetic or documentation improvement | backlog |
+| Severity | Meaning                                                                   | Release effect                            |
+| -------- | ------------------------------------------------------------------------- | ----------------------------------------- |
+| S0       | account compromise, evidence exposure, arbitrary competition-truth change | stop testing, contain, investigate        |
+| S1       | incorrect result/standings, auth bypass, unrecoverable data loss          | block release                             |
+| S2       | major workflow unavailable with a safe workaround                         | release only with explicit owner decision |
+| S3       | limited usability or presentation issue                                   | may defer with tracked issue              |
+| S4       | cosmetic or documentation improvement                                     | backlog                                   |
 
 ## Exit criteria for closed pilot
 

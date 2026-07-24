@@ -1,7 +1,9 @@
 import type { TournamentSummary } from '@arenasports/contracts';
 
 export interface TournamentRepository {
-  create(tournament: TournamentSummary & { organizerId: string; description: string }): Promise<void>;
+  create(
+    tournament: TournamentSummary & { organizerId: string; description: string },
+  ): Promise<void>;
   listPublic(): Promise<TournamentSummary[]>;
 }
 

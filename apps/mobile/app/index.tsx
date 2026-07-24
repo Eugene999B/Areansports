@@ -20,8 +20,8 @@ export default function HomeScreen() {
         <Text style={styles.eyebrow}>COMPETE WITH PROOF</Text>
         <Text style={styles.title}>Your league. Your rivals. Fair results.</Text>
         <Text style={styles.subtitle}>
-          Join mobile esports tournaments with clear fixtures, deadlines,
-          evidence, standings, and decisions everyone can understand.
+          Join mobile esports tournaments with clear fixtures, deadlines, evidence, standings, and
+          decisions everyone can understand.
         </Text>
       </View>
 

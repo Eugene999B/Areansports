@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-      time: "06:00"
+      time: '06:00'
       timezone: Africa/Accra
     open-pull-requests-limit: 5
     groups:
@@ -21,6 +21,6 @@ updates:
     schedule:
       interval: weekly
       day: monday
-      time: "06:30"
+      time: '06:30'
       timezone: Africa/Accra
     open-pull-requests-limit: 3
