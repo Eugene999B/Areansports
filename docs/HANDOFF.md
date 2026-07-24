@@ -38,28 +38,29 @@ This branch should contain durable documentation, workspace tooling, database sc
 - `pnpm-lock.yaml` was generated in a clean GitHub-hosted environment and is enforced with frozen installation.
 - Formatting, Prisma validation, typecheck, ten automated tests, all package builds, Expo Android export, and compiled API startup pass on push and pull-request workflows.
 - The exact validation evidence is recorded in `docs/VALIDATION.md`.
-- Draft pull request [#3](https://github.com/Eugene999B/Areansports/pull/3) tracks AS-02 on gent/identity-sessions.
+- Draft pull request [#3](https://github.com/Eugene999B/Areansports/pull/3) tracks AS-02 on `agent/identity-sessions`.
 - ADR 0004 selects Supabase Auth; provider-neutral identity/session contracts and four tests are implemented and CI-validated.
 - Prisma persistence now includes normalized handles, notification preferences, provider identities, revocable role assignments, and hashed provider-session metadata.
+- The initial PostgreSQL migration is committed; CI applies it to a fresh database before typechecking, tests, builds, and the API smoke test.
 - No Supabase project, production credentials, provider integration, staging environment, or mobile-store release exists yet.
 
 ## Next tasks in priority order
 
 1. Generate and review a Prisma migration for the identity schema, including safe `normalizedHandle` backfill and rollback notes.
 2. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
-3. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
-4. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
-5. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.
-6. Replace the in-memory tournament repository with PostgreSQL and implement versioned tournament publication.
-7. Add registration, waitlists, rules acknowledgement, and deterministic fixtures.
-8. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
-9. Configure a staging environment and Android internal testing.
-10. Run a closed Ghana community beta with documented moderation and support operations.
+2. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
+3. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
+4. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.
+5. Replace the in-memory tournament repository with PostgreSQL and implement versioned tournament publication.
+6. Add registration, waitlists, rules acknowledgement, and deterministic fixtures.
+7. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
+8. Configure a staging environment and Android internal testing.
+9. Run a closed Ghana community beta with documented moderation and support operations.
 
 ## Known blockers and risks
 
 - No official game-result API or publisher agreement.
-- Authentication, storage, push, email/SMS, analytics, and hosting vendors are not selected.
+- Supabase Auth is selected but not provisioned; storage, push, transactional email/SMS, analytics, and hosting vendors are not selected.
 - Ghana privacy, consumer, child-safety, and future monetization requirements need qualified legal review.
 - App name, visual identity, domain, and Google Play package identifier require owner confirmation.
 - Production moderation staffing and escalation are not defined.
@@ -93,7 +94,9 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Accepted ADR 0004: Supabase Auth for the pilot behind an ArenaSports provider adapter.
 - Added identity, role, profile, session, and handle-normalization contracts plus four tests.
 - Passed the full push CI gate on workflow 30112009004.
-- Added the identity persistence schema after this checkpoint; migration generation and JWT integration are next.
+- Added the identity persistence schema and committed the cloud-generated initial PostgreSQL migration.
+- Verified migration deployment plus the complete CI gate on push run 30113466310 and pull-request run 30113468066.
+- JWT/JWKS verification and negative security tests are the next unfinished work.
 
 ### 2026-07-24 - foundation validation completed
 

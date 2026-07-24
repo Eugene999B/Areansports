@@ -1,15 +1,19 @@
 # Validation record
 
-## 2026-07-24 AS-02 identity checkpoint
+## 2026-07-24 AS-02 identity and migration checkpoint
 
 **Branch:** `agent/identity-sessions`  
 **Draft PR:** [#3](https://github.com/Eugene999B/Areansports/pull/3)  
-**Validated commit:** `6ccc82b7cd93e9f2fb28b3cbdcce61b607525103`  
-**Push CI:** [run 30112894387](https://github.com/Eugene999B/Areansports/actions/runs/30112894387)  
+**Validated commit:** `bfddbdaa4624b211ec4eaea5ae965aa880125bf2`  
+**Push CI:** [run 30113466310](https://github.com/Eugene999B/Areansports/actions/runs/30113466310)  
+**Pull-request CI:** [run 30113468066](https://github.com/Eugene999B/Areansports/actions/runs/30113468066)  
 **Result:** Passed
 
-The authentication-provider ADR, shared identity/session contracts, four identity tests, and Prisma persistence schema passed frozen installation, formatting, Prisma validation, typecheck, all tests, all builds, Android export, and compiled API startup. No Supabase project or secret was created. Migration generation, JWT verification, and live provider integration remain unimplemented.
+ADR 0004, provider-neutral identity/session contracts, four identity tests, and Prisma persistence for accounts, provider subjects, roles, and sessions are implemented. The cloud-generated baseline migration is committed at `packages/database/prisma/migrations/20260724173000_initial/migration.sql` with a PostgreSQL migration lock.
 
+Both final workflows installed from the frozen lockfile, passed formatting and Prisma validation, deployed the committed migration to an empty PostgreSQL 18 database, passed typecheck and all tests, built all packages including the Android export, and smoke-tested the compiled API.
+
+This is a new pre-production database history, so `normalizedHandle` has no legacy rows to backfill. Destructive rollback is permitted only for disposable development databases; once shared or production data exists, corrections must use reviewed forward migrations. No Supabase project, credential, or secret was created. JWT/JWKS verification and live provider integration remain unimplemented.
 ## 2026-07-24 foundation branch
 
 **Branch:** `agent/platform-foundation`  

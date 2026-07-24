@@ -15,17 +15,17 @@ The first release is intentionally free. It does **not** include entry fees, bet
 **Checkpoint date:** 2026-07-24  
 **Active branch:** `agent/identity-sessions`  
 **Draft pull request:** [#3 - Start identity and session foundation](https://github.com/Eugene999B/Areansports/pull/3)  
-**Last fully validated checkpoint:** `2093058570f1c389e4686817a93f866d33388ac4`
+**Last fully validated checkpoint:** `bfddbdaa4624b211ec4eaea5ae965aa880125bf2`
 
 The foundation is implemented and reproducible; ArenaSports is not yet a production-ready application. The words **validated**, **scaffolded**, and **planned** are used deliberately so a future developer or AI agent does not mistake a database shape or interface for completed behavior.
 
 - **Product and operations ? validated documentation:** Product requirements, architecture, API conventions, data model, match verification, security, moderation operations, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog.
 - **Workspace ? validated:** pnpm 11 monorepo, Node.js 22 requirement, committed frozen lockfile, shared TypeScript configuration, Prettier, and scoped contributor instructions.
 - **Shared contracts ? implemented and tested:** Zod schemas and TypeScript types for API errors, tournaments, matches, visibility, formats, and lifecycle rules.
-- **Database ? scaffolded:** Prisma 7 PostgreSQL schema, generated client package, seed foundation, and Docker PostgreSQL service. Application repositories are not yet PostgreSQL-backed.
+- **Database ? schema and migration validated:** Prisma 7 PostgreSQL schema, generated client package, seed foundation, committed initial migration, and Docker PostgreSQL service. Application repositories are not yet PostgreSQL-backed.
 - **API ? foundation implemented and tested:** Fastify server, configuration validation, health endpoints, standard error envelope, guarded tournament draft/discovery routes, domain service, and in-memory tournament repository.
 - **Mobile ? foundation implemented and built:** Expo Router Android/iOS shell, home and tournament screens, typed API client, reusable components, loading/error/empty states, and Android export.
-- **CI ? validated:** Frozen install, formatting, Prisma validation/client generation, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test.
+- **CI ? validated:** Frozen install, formatting, Prisma validation/client generation, committed migration deployment to fresh PostgreSQL, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test.
 - **Deployment ? planned:** No staging or production environment, domain, secrets, Android signing, monitoring, or store release is configured.
 
 ### Important fixes already completed
@@ -63,9 +63,10 @@ Validation evidence:
 - Shared contracts now define roles, account states, profiles, profile updates, session summaries, and normalized handles.
 - Four identity tests cover normalization, ambiguous-character rejection, empty updates, and separation of provider identity from ArenaSports roles.
 - Prisma now models normalized handles, notification preferences, Supabase subject mappings, revocable role grants, and hashed provider-session metadata without storing provider tokens or passwords.
+- A reviewed baseline migration is committed and CI deploys it to a fresh PostgreSQL service on every push and pull request.
 - Push CI passed on the first AS-02 commit: [workflow 30112009004](https://github.com/Eugene999B/Areansports/actions/runs/30112009004).
 
-**First unfinished task:** generate and review the Prisma migration for the new identity schema, including safe backfill behavior for `normalizedHandle`. After that, implement JWT/JWKS verification and negative security tests before adding mobile sign-in screens.
+**First unfinished task:** implement Supabase JWT/JWKS verification with strict issuer/audience checks, account-status enforcement, and negative security tests. Do not add mobile sign-in screens until that server trust boundary passes.
 
 ### Current slice: AS-02 identity and sessions
 
@@ -73,9 +74,9 @@ The next contributor should not jump directly to brackets, evidence, or social f
 
 1. Read `AGENTS.md`, `docs/HANDOFF.md`, `docs/VALIDATION.md`, and `docs/EXECUTION_BACKLOG.md`.
 2. Confirm the active branch and draft pull request still match this checkpoint.
-3. Write an ADR selecting the authentication provider for the Ghana pilot, including email/phone availability, cost, abuse controls, data location, account recovery, and provider-exit strategy.
-4. Implement account, role, profile, session, and security-audit persistence with migrations.
-5. Add short-lived access sessions, rotating/revocable refresh sessions, account-status enforcement, authorization tests, API contracts, and mobile authentication states.
+3. Treat ADR 0004, the provider-neutral contracts, identity persistence schema, and committed baseline migration as completed.
+4. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
+5. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, redacted security audit events, and then mobile authentication states.
 6. Keep the first release free: do not add betting, wagering, entry fees, wallets, prize custody, or cash settlement.
 7. Do not scrape publishers, intercept game traffic, collect game passwords, or claim username matching is official result verification.
 8. Run the full CI gate and update this README, `docs/HANDOFF.md`, and `docs/VALIDATION.md` before stopping.
