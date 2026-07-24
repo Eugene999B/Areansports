@@ -14,6 +14,7 @@ ADR 0004, provider-neutral identity/session contracts, four identity tests, and 
 Both final workflows installed from the frozen lockfile, passed formatting and Prisma validation, deployed the committed migration to an empty PostgreSQL 18 database, passed typecheck and all tests, built all packages including the Android export, and smoke-tested the compiled API.
 
 This is a new pre-production database history, so `normalizedHandle` has no legacy rows to backfill. Destructive rollback is permitted only for disposable development databases; once shared or production data exists, corrections must use reviewed forward migrations. No Supabase project, credential, or secret was created. JWT/JWKS verification and live provider integration remain unimplemented.
+
 ## 2026-07-24 foundation branch
 
 **Branch:** `agent/platform-foundation`  

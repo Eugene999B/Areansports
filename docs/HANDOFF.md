@@ -46,8 +46,7 @@ This branch should contain durable documentation, workspace tooling, database sc
 
 ## Next tasks in priority order
 
-1. Generate and review a Prisma migration for the identity schema, including safe `normalizedHandle` backfill and rollback notes.
-2. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
+1. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
 2. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
 3. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
 4. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.

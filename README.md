@@ -19,14 +19,14 @@ The first release is intentionally free. It does **not** include entry fees, bet
 
 The foundation is implemented and reproducible; ArenaSports is not yet a production-ready application. The words **validated**, **scaffolded**, and **planned** are used deliberately so a future developer or AI agent does not mistake a database shape or interface for completed behavior.
 
-- **Product and operations ? validated documentation:** Product requirements, architecture, API conventions, data model, match verification, security, moderation operations, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog.
-- **Workspace ? validated:** pnpm 11 monorepo, Node.js 22 requirement, committed frozen lockfile, shared TypeScript configuration, Prettier, and scoped contributor instructions.
-- **Shared contracts ? implemented and tested:** Zod schemas and TypeScript types for API errors, tournaments, matches, visibility, formats, and lifecycle rules.
-- **Database ? schema and migration validated:** Prisma 7 PostgreSQL schema, generated client package, seed foundation, committed initial migration, and Docker PostgreSQL service. Application repositories are not yet PostgreSQL-backed.
-- **API ? foundation implemented and tested:** Fastify server, configuration validation, health endpoints, standard error envelope, guarded tournament draft/discovery routes, domain service, and in-memory tournament repository.
-- **Mobile ? foundation implemented and built:** Expo Router Android/iOS shell, home and tournament screens, typed API client, reusable components, loading/error/empty states, and Android export.
-- **CI ? validated:** Frozen install, formatting, Prisma validation/client generation, committed migration deployment to fresh PostgreSQL, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test.
-- **Deployment ? planned:** No staging or production environment, domain, secrets, Android signing, monitoring, or store release is configured.
+- **Product and operations (validated documentation):** Product requirements, architecture, API conventions, data model, match verification, security, moderation operations, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog.
+- **Workspace (validated):** pnpm 11 monorepo, Node.js 22 requirement, committed frozen lockfile, shared TypeScript configuration, Prettier, and scoped contributor instructions.
+- **Shared contracts (implemented and tested):** Zod schemas and TypeScript types for API errors, tournaments, matches, visibility, formats, and lifecycle rules.
+- **Database (schema and migration validated):** Prisma 7 PostgreSQL schema, generated client package, seed foundation, committed initial migration, and Docker PostgreSQL service. Application repositories are not yet PostgreSQL-backed.
+- **API (foundation implemented and tested):** Fastify server, configuration validation, health endpoints, standard error envelope, guarded tournament draft/discovery routes, domain service, and in-memory tournament repository.
+- **Mobile (foundation implemented and built):** Expo Router Android/iOS shell, home and tournament screens, typed API client, reusable components, loading/error/empty states, and Android export.
+- **CI (validated):** Frozen install, formatting, Prisma validation/client generation, committed migration deployment to fresh PostgreSQL, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test.
+- **Deployment (planned):** No staging or production environment, domain, secrets, Android signing, monitoring, or store release is configured.
 
 ### Important fixes already completed
 
