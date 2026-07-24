@@ -28,6 +28,31 @@ export async function buildServer(options: BuildServerOptions): Promise<FastifyI
     disableRequestLogging: options.config.nodeEnv === 'test',
   });
 
+  app.setErrorHandler((error, request, reply) => {
+    if (error instanceof AppError) {
+      return reply.code(error.statusCode).send({
+        error: {
+          code: error.code,
+          message: error.message,
+          details: error.details,
+          retryable: error.retryable,
+        },
+        meta: { requestId: request.id },
+      });
+    }
+
+    request.log.error({ error }, 'Unhandled request error');
+    return reply.code(500).send({
+      error: {
+        code: 'INTERNAL_ERROR',
+        message: 'An unexpected error occurred.',
+        details: {},
+        retryable: false,
+      },
+      meta: { requestId: request.id },
+    });
+  });
+
   await app.register(cors, {
     origin: options.config.corsOrigins,
     credentials: false,
@@ -56,31 +81,6 @@ export async function buildServer(options: BuildServerOptions): Promise<FastifyI
       meta: { requestId: request.id },
     }),
   );
-
-  app.setErrorHandler((error, request, reply) => {
-    if (error instanceof AppError) {
-      return reply.code(error.statusCode).send({
-        error: {
-          code: error.code,
-          message: error.message,
-          details: error.details,
-          retryable: error.retryable,
-        },
-        meta: { requestId: request.id },
-      });
-    }
-
-    request.log.error({ error }, 'Unhandled request error');
-    return reply.code(500).send({
-      error: {
-        code: 'INTERNAL_ERROR',
-        message: 'An unexpected error occurred.',
-        details: {},
-        retryable: false,
-      },
-      meta: { requestId: request.id },
-    });
-  });
 
   return app;
 }
