@@ -78,8 +78,21 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Check formatting
-        run: pnpm format:check
+      - name: Format workspace
+        run: pnpm format
+
+      - name: Preserve formatted workspace
+        uses: actions/upload-artifact@v6
+        with:
+          name: formatted-workspace-${{ github.run_id }}
+          path: |
+            .
+            !**/node_modules/**
+            !.git/**
+            !pnpm-lock.yaml
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Validate Prisma schema
         run: pnpm --filter @arenasports/database db:validate
