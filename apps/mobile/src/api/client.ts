@@ -42,7 +42,7 @@ export async function fetchPublicTournaments(
   try {
     const response = await fetch(`${API_URL}/tournaments`, {
       headers: { Accept: 'application/json' },
-      signal,
+      signal: signal ?? null,
     });
 
     if (!response.ok) {
