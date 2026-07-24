@@ -2,8 +2,8 @@
 
 **Last updated:** 2026-07-24  
 **Owner:** Eugene999B  
-**Active branch:** `agent/platform-foundation`  
-**Stage:** Foundation validated / identity design
+**Active branch:** `agent/identity-sessions`  
+**Stage:** AS-02 identity and session implementation
 
 This file is the operational starting point for the next human developer or AI agent.
 
@@ -32,19 +32,23 @@ This branch should contain durable documentation, workspace tooling, database sc
 
 ## Current state
 
-- Draft pull request [#1](https://github.com/Eugene999B/Areansports/pull/1) remains open against `main`.
+- Foundation pull request [#1](https://github.com/Eugene999B/Areansports/pull/1) was squash-merged into `main` as `23ce0434e04709c59ec4a905bc1b0b869ab408ee`.
 - Product, architecture, integrity, security, API, data, execution backlog, test strategy, moderation operations, and Ghana pilot documentation are committed.
 - The pnpm workspace, shared contracts, Prisma 7 database package, Fastify API, Expo mobile shell, tests, and CI are implemented as a runnable foundation.
 - `pnpm-lock.yaml` was generated in a clean GitHub-hosted environment and is enforced with frozen installation.
 - Formatting, Prisma validation, typecheck, ten automated tests, all package builds, Expo Android export, and compiled API startup pass on push and pull-request workflows.
 - The exact validation evidence is recorded in `docs/VALIDATION.md`.
-- No production credentials, publisher integration, staging environment, or mobile-store release exists yet.
+- Draft pull request [#3](https://github.com/Eugene999B/Areansports/pull/3) tracks AS-02 on gent/identity-sessions.
+- ADR 0004 selects Supabase Auth; provider-neutral identity/session contracts and four tests are implemented and CI-validated.
+- No Supabase project, production credentials, provider integration, staging environment, or mobile-store release exists yet.
 
 ## Next tasks in priority order
 
-1. Complete AS-02 by selecting the authentication provider through an ADR and implementing account/session boundaries.
-2. Add user, session, role, profile, and security-audit persistence with migrations and integration tests.
-3. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.
+1. Add provider identity, role assignment, and session metadata persistence with a reviewed Prisma migration.
+2. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
+3. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
+4. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
+5. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.
 4. Replace the in-memory tournament repository with PostgreSQL and implement versioned tournament publication.
 5. Add registration, waitlists, rules acknowledgement, and deterministic fixtures.
 6. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
@@ -81,6 +85,14 @@ This branch should contain durable documentation, workspace tooling, database sc
 
 ## Session log
 
+### 2026-07-24 - AS-02 identity started
+
+- Squash-merged the validated foundation into `main` and created `agent/identity-sessions`.
+- Opened draft PR #3 for AS-02.
+- Accepted ADR 0004: Supabase Auth for the pilot behind an ArenaSports provider adapter.
+- Added identity, role, profile, session, and handle-normalization contracts plus four tests.
+- Passed the full push CI gate on workflow 30112009004.
+- Stopped before persistence/JWT integration; the exact next task is recorded above.
 ### 2026-07-24 - foundation validation completed
 
 - Resolved pnpm dependency-build approval and TypeScript 7 compatibility failures.

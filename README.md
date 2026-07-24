@@ -13,20 +13,20 @@ The first release is intentionally free. It does **not** include entry fees, bet
 ## Current implementation and AI continuation
 
 **Checkpoint date:** 2026-07-24  
-**Active branch:** `agent/platform-foundation`  
-**Draft pull request:** [#1 - Build ArenaSports platform foundation](https://github.com/Eugene999B/Areansports/pull/1)  
+**Active branch:** `agent/identity-sessions`  
+**Draft pull request:** [#3 - Start identity and session foundation](https://github.com/Eugene999B/Areansports/pull/3)  
 **Last fully validated checkpoint:** `2093058570f1c389e4686817a93f866d33388ac4`
 
 The foundation is implemented and reproducible; ArenaSports is not yet a production-ready application. The words **validated**, **scaffolded**, and **planned** are used deliberately so a future developer or AI agent does not mistake a database shape or interface for completed behavior.
 
-- **Product and operations — validated documentation:** Product requirements, architecture, API conventions, data model, match verification, security, moderation operations, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog.
-- **Workspace — validated:** pnpm 11 monorepo, Node.js 22 requirement, committed frozen lockfile, shared TypeScript configuration, Prettier, and scoped contributor instructions.
-- **Shared contracts — implemented and tested:** Zod schemas and TypeScript types for API errors, tournaments, matches, visibility, formats, and lifecycle rules.
-- **Database — scaffolded:** Prisma 7 PostgreSQL schema, generated client package, seed foundation, and Docker PostgreSQL service. Application repositories are not yet PostgreSQL-backed.
-- **API — foundation implemented and tested:** Fastify server, configuration validation, health endpoints, standard error envelope, guarded tournament draft/discovery routes, domain service, and in-memory tournament repository.
-- **Mobile — foundation implemented and built:** Expo Router Android/iOS shell, home and tournament screens, typed API client, reusable components, loading/error/empty states, and Android export.
-- **CI — validated:** Frozen install, formatting, Prisma validation/client generation, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test.
-- **Deployment — planned:** No staging or production environment, domain, secrets, Android signing, monitoring, or store release is configured.
+- **Product and operations ? validated documentation:** Product requirements, architecture, API conventions, data model, match verification, security, moderation operations, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog.
+- **Workspace ? validated:** pnpm 11 monorepo, Node.js 22 requirement, committed frozen lockfile, shared TypeScript configuration, Prettier, and scoped contributor instructions.
+- **Shared contracts ? implemented and tested:** Zod schemas and TypeScript types for API errors, tournaments, matches, visibility, formats, and lifecycle rules.
+- **Database ? scaffolded:** Prisma 7 PostgreSQL schema, generated client package, seed foundation, and Docker PostgreSQL service. Application repositories are not yet PostgreSQL-backed.
+- **API ? foundation implemented and tested:** Fastify server, configuration validation, health endpoints, standard error envelope, guarded tournament draft/discovery routes, domain service, and in-memory tournament repository.
+- **Mobile ? foundation implemented and built:** Expo Router Android/iOS shell, home and tournament screens, typed API client, reusable components, loading/error/empty states, and Android export.
+- **CI ? validated:** Frozen install, formatting, Prisma validation/client generation, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test.
+- **Deployment ? planned:** No staging or production environment, domain, secrets, Android signing, monitoring, or store release is configured.
 
 ### Important fixes already completed
 
@@ -55,7 +55,17 @@ Validation evidence:
 - Organizer/moderator interfaces, staging infrastructure, real-device Android validation, Google Play packaging, or production operations.
 - Any official eFootball or EA SPORTS FC result integration; no authorized publisher API has been established.
 
-### Required next slice: AS-02 identity and sessions
+### AS-02 progress at this checkpoint
+
+- Foundation PR #1 was validated, marked ready, and squash-merged into `main` as `23ce0434e04709c59ec4a905bc1b0b869ab408ee`.
+- ADR 0004 selects Supabase Auth for the Ghana pilot while preserving a provider-neutral API boundary.
+- Verified email is first; Google waits for final Android identifiers; phone/SMS waits for cost and abuse approval.
+- Shared contracts now define roles, account states, profiles, profile updates, session summaries, and normalized handles.
+- Four identity tests cover normalization, ambiguous-character rejection, empty updates, and separation of provider identity from ArenaSports roles.
+- Push CI passed on the first AS-02 commit: [workflow 30112009004](https://github.com/Eugene999B/Areansports/actions/runs/30112009004).
+
+**First unfinished task:** add provider identity, role assignment, and session metadata models with a reviewed Prisma migration. After that, implement JWT/JWKS verification and negative security tests before adding mobile sign-in screens.
+### Current slice: AS-02 identity and sessions
 
 The next contributor should not jump directly to brackets, evidence, or social features. Continue in dependency order:
 

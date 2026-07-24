@@ -1,5 +1,14 @@
 # Validation record
 
+## 2026-07-24 AS-02 identity checkpoint
+
+**Branch:** `agent/identity-sessions`  
+**Draft PR:** [#3](https://github.com/Eugene999B/Areansports/pull/3)  
+**Validated commit:** `efedf6b06412d51f5be281975f9025906c9bf37c`  
+**Push CI:** [run 30112009004](https://github.com/Eugene999B/Areansports/actions/runs/30112009004)  
+**Result:** Passed
+
+The authentication-provider ADR, shared identity/session contracts, contract export, and four new identity tests passed frozen installation, formatting, Prisma validation, typecheck, all tests, all builds, Android export, and compiled API startup. No Supabase project or secret was created, and provider persistence/JWT verification remain unimplemented.
 ## 2026-07-24 foundation branch
 
 **Branch:** `agent/platform-foundation`  
