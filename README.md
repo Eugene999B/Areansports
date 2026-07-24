@@ -10,6 +10,68 @@ ArenaSports is a mobile-first community competition platform for organizing fair
 
 The first release is intentionally free. It does **not** include entry fees, betting, wagering, prize custody, or cash settlement. Donations and clearly defined premium convenience features may be considered later, after the free competition experience, safety controls, and legal review are proven.
 
+## Current implementation and AI continuation
+
+**Checkpoint date:** 2026-07-24  
+**Active branch:** `agent/platform-foundation`  
+**Draft pull request:** [#1 - Build ArenaSports platform foundation](https://github.com/Eugene999B/Areansports/pull/1)  
+**Last fully validated checkpoint:** `2093058570f1c389e4686817a93f866d33388ac4`
+
+The foundation is implemented and reproducible; ArenaSports is not yet a production-ready application. The words **validated**, **scaffolded**, and **planned** are used deliberately so a future developer or AI agent does not mistake a database shape or interface for completed behavior.
+
+| Area | Status | What exists now |
+| --- | --- | --- |
+| Product and operations | Validated documentation | Product requirements, architecture, API conventions, data model, match verification, security, moderation operations, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog |
+| Workspace | Validated | pnpm 11 monorepo, Node.js 22 requirement, committed frozen lockfile, shared TypeScript configuration, Prettier, and scoped contributor instructions |
+| Shared contracts | Implemented and tested | Zod schemas and TypeScript types for API errors, tournaments, matches, visibility, formats, and lifecycle rules |
+| Database | Scaffolded | Prisma 7 PostgreSQL schema, generated client package, seed foundation, and Docker PostgreSQL service; application repositories are not yet PostgreSQL-backed |
+| API | Foundation implemented and tested | Fastify server, configuration validation, health endpoints, standard error envelope, guarded tournament draft/discovery routes, domain service, and in-memory tournament repository |
+| Mobile | Foundation implemented and built | Expo Router Android/iOS shell, home and tournament screens, typed API client, reusable components, loading/error/empty states, and Android export |
+| CI | Validated | Frozen install, formatting, Prisma validation/client generation, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test |
+| Deployment | Planned | No staging or production environment, domain, secrets, Android signing, monitoring, or store release is configured |
+
+### Important fixes already completed
+
+- GitHub Actions account access was restored and both push and pull-request workflows now execute.
+- pnpm dependency build approvals were restricted to the required Prisma and esbuild packages.
+- TypeScript 7 and Expo path-alias compatibility was corrected.
+- Strict optional request-signal typing was corrected in the mobile API client.
+- Fastify error-handler registration was moved ahead of route plugins so all routes inherit the documented error envelope.
+- The clean cloud-generated `pnpm-lock.yaml` was committed and CI now rejects lockfile drift.
+- The entire repository was formatted, and formatting is enforced by CI.
+- The compiled API is started in CI and must answer `/health/live` successfully.
+
+Validation evidence:
+
+- [Push workflow 30109954288](https://github.com/Eugene999B/Areansports/actions/runs/30109954288)
+- [Pull-request workflow 30109957671](https://github.com/Eugene999B/Areansports/actions/runs/30109957671)
+- [Detailed validation record](docs/VALIDATION.md)
+
+### What is not implemented yet
+
+- Real account registration, authentication provider integration, recovery, refresh-session rotation, or session revocation.
+- Persisted user roles, profiles, security audit events, or authorization beyond the guarded demo boundary.
+- Game-profile ownership and normalization flows.
+- PostgreSQL-backed tournament lifecycle, immutable publication snapshots, registration, waitlists, fixtures, standings, or brackets.
+- Match check-ins, availability, result submissions, private evidence storage, no-show decisions, disputes, appeals, or notifications.
+- Organizer/moderator interfaces, staging infrastructure, real-device Android validation, Google Play packaging, or production operations.
+- Any official eFootball or EA SPORTS FC result integration; no authorized publisher API has been established.
+
+### Required next slice: AS-02 identity and sessions
+
+The next contributor should not jump directly to brackets, evidence, or social features. Continue in dependency order:
+
+1. Read `AGENTS.md`, `docs/HANDOFF.md`, `docs/VALIDATION.md`, and `docs/EXECUTION_BACKLOG.md`.
+2. Confirm the active branch and draft pull request still match this checkpoint.
+3. Write an ADR selecting the authentication provider for the Ghana pilot, including email/phone availability, cost, abuse controls, data location, account recovery, and provider-exit strategy.
+4. Implement account, role, profile, session, and security-audit persistence with migrations.
+5. Add short-lived access sessions, rotating/revocable refresh sessions, account-status enforcement, authorization tests, API contracts, and mobile authentication states.
+6. Keep the first release free: do not add betting, wagering, entry fees, wallets, prize custody, or cash settlement.
+7. Do not scrape publishers, intercept game traffic, collect game passwords, or claim username matching is official result verification.
+8. Run the full CI gate and update this README, `docs/HANDOFF.md`, and `docs/VALIDATION.md` before stopping.
+
+The canonical implementation sequence and acceptance criteria are in [Execution Backlog](docs/EXECUTION_BACKLOG.md). The most current operational continuation record is [Current Handoff](docs/HANDOFF.md).
+
 ## The problem
 
 Community organizers currently coordinate registration, fixtures, results, tables, disputes, and player availability by hand. That creates predictable failures:
