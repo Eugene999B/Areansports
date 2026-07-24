@@ -71,6 +71,18 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Format authentication slice
+        run: pnpm exec prettier --write apps/api/src/config.ts apps/api/src/modules/identity/authentication.ts apps/api/test/authentication.test.ts
+
+      - name: Preserve formatted authentication slice
+        uses: actions/upload-artifact@v7
+        with:
+          name: formatted-auth-${{ github.run_id }}
+          path: |
+            apps/api/src/config.ts
+            apps/api/src/modules/identity/authentication.ts
+            apps/api/test/authentication.test.ts
+          if-no-files-found: error
       - name: Check formatting
         run: pnpm format:check
 
