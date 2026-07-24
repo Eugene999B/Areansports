@@ -50,6 +50,7 @@ This branch should contain durable documentation, workspace tooling, database sc
 6. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
 7. Configure a staging environment and Android internal testing.
 8. Run a closed Ghana community beta with documented moderation and support operations.
+
 ## Known blockers and risks
 
 - No official game-result API or publisher agreement.
@@ -94,5 +95,5 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Created `agent/platform-foundation`.
 - Completed documentation and monorepo foundation scaffold.
 - Used direct GitHub API operations; no project repository was cloned locally.
-- Opened draft PR #1; validation remains blocked by the GitHub account billing lock.
-- Added delivery backlog, test strategy, moderation operations, and Ghana closed-pilot launch planning while major feature implementation is paused.
+- Opened draft PR #1; the initial validation attempt was blocked by an account billing lock.
+- Added delivery backlog, test strategy, moderation operations, and Ghana closed-pilot launch planning while the foundation awaited validation.
