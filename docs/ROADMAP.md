@@ -27,8 +27,8 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 - [x] Database schema
 - [x] API and mobile shells
 - [x] CI workflow committed
-- [ ] CI workflow successfully executed
-- [ ] Clean-environment install/build verification
+- [x] CI workflow successfully executed
+- [x] Clean-environment install/build verification
 
 **Exit:** A contributor can understand the trust boundaries, start services, and run passing checks.
 

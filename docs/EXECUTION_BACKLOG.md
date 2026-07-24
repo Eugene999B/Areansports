@@ -33,6 +33,8 @@ No later slice may bypass the invariants owned by an earlier slice.
 
 **Outcome:** A new cloud environment can install and run the repository without hidden state.
 
+**Status:** Automated acceptance verified on 2026-07-24. Real Android device/emulator validation remains a release gate.
+
 Deliverables:
 
 - generate and commit `pnpm-lock.yaml` from a clean install;
