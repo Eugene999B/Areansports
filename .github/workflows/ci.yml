@@ -71,27 +71,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate initial migration baseline
-        run: |
-          mkdir -p packages/database/prisma/migrations/20260724173000_initial
-          printf 'provider = "postgresql"\n' > packages/database/prisma/migrations/migration_lock.toml
-          pnpm --filter @arenasports/database exec prisma migrate diff --from-empty --to-schema prisma/schema.prisma --script > packages/database/prisma/migrations/20260724173000_initial/migration.sql
-
-      - name: Preserve generated migration
-        uses: actions/upload-artifact@v6
-        with:
-          name: prisma-migration-${{ github.run_id }}
-          path: packages/database/prisma/migrations
-          if-no-files-found: error
-          retention-days: 1
-
-      - name: Apply generated migration
-        run: pnpm --filter @arenasports/database db:deploy
       - name: Check formatting
         run: pnpm format:check
 
       - name: Validate Prisma schema
         run: pnpm --filter @arenasports/database db:validate
+
+      - name: Apply database migrations
+        run: pnpm --filter @arenasports/database db:deploy
 
       - name: Typecheck
         run: pnpm typecheck
