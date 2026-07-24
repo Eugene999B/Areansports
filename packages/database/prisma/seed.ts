@@ -1,4 +1,4 @@
-import { database } from '../src/client.js';
+import { database } from '../src/client.ts';
 
 async function main(): Promise<void> {
   await database.game.upsert({

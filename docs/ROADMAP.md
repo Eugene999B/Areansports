@@ -16,15 +16,16 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 - [x] Repository and foundation branch
 - [x] Durable agent instructions
 - [x] Handoff protocol
-- [ ] Product requirements
-- [ ] Architecture and ADRs
-- [ ] Data model and API contract
-- [ ] Match verification and safety model
-- [ ] pnpm monorepo
-- [ ] Shared contracts
-- [ ] Database schema
-- [ ] API and mobile shells
-- [ ] CI quality gate
+- [x] Product requirements
+- [x] Architecture and ADRs
+- [x] Data model and API contract
+- [x] Match verification and safety model
+- [x] pnpm monorepo
+- [x] Shared contracts
+- [x] Database schema
+- [x] API and mobile shells
+- [x] CI workflow committed
+- [ ] CI workflow successfully executed
 - [ ] Clean-environment install/build verification
 
 **Exit:** A contributor can understand the trust boundaries, start services, and run passing checks.

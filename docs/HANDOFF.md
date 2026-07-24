@@ -36,20 +36,22 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Product direction captured from owner conversations.
 - GitHub owner authentication established.
 - Foundation branch created.
-- Documentation checkpoint is being committed.
-- Application code has not been deployed.
+- Product, architecture, integrity, security, API, and data documentation are committed.
+- pnpm workspace, shared contracts, Prisma 7 database package, Fastify API, Expo mobile shell, tests, and CI are scaffolded.
+- GitHub Actions run 30097444625 did not start because GitHub reports the account is locked due to a billing issue.
+- No clean dependency install, typecheck, test, build, database migration, mobile launch, or deployment has been verified.
 - No production credentials or environments exist.
 
 ## Next tasks in priority order
 
-1. Complete product, architecture, data, API, verification, security, and ADR documentation.
-2. Add root pnpm workspace and development infrastructure.
-3. Add shared contract package.
-4. Add Prisma schema and database client.
-5. Add Fastify API foundation.
-6. Add Expo mobile shell and tournament discovery screens.
-7. Add tests and CI.
-8. Run a clean checkout/install/build.
+1. Resolve the GitHub Actions billing lock and rerun CI.
+2. Run a clean checkout/install/build and commit pnpm-lock.yaml.
+3. Fix any validation failures and record exact results.
+4. Replace the in-memory tournament repository with PostgreSQL persistence.
+5. Add real authentication and authorization.
+6. Implement tournament publication, ruleset snapshots, and registration.
+7. Implement deterministic fixtures and scoring.
+8. Implement match check-in, submissions, evidence, resolution, disputes, and audit trail.
 9. Add authentication and authorization.
 10. Implement persistent tournament creation and registration.
 11. Implement match check-in, submissions, evidence, resolution, disputes, and audit trail.
