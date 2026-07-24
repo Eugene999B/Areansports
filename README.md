@@ -15,7 +15,7 @@ The first release is intentionally free. It does **not** include entry fees, bet
 **Checkpoint date:** 2026-07-24  
 **Active branch:** `agent/identity-sessions`  
 **Draft pull request:** [#3 - Start identity and session foundation](https://github.com/Eugene999B/Areansports/pull/3)  
-**Last fully validated checkpoint:** `bfddbdaa4624b211ec4eaea5ae965aa880125bf2`
+**Last fully validated checkpoint:** `fe9cb94896015079736cc378931ca26ab5de2531`
 
 The foundation is implemented and reproducible; ArenaSports is not yet a production-ready application. The words **validated**, **scaffolded**, and **planned** are used deliberately so a future developer or AI agent does not mistake a database shape or interface for completed behavior.
 
@@ -25,7 +25,7 @@ The foundation is implemented and reproducible; ArenaSports is not yet a product
 - **Database (schema and migration validated):** Prisma 7 PostgreSQL schema, generated client package, seed foundation, committed initial migration, and Docker PostgreSQL service. Application repositories are not yet PostgreSQL-backed.
 - **API (foundation implemented and tested):** Fastify server, configuration validation, health endpoints, standard error envelope, guarded tournament draft/discovery routes, domain service, and in-memory tournament repository.
 - **Mobile (foundation implemented and built):** Expo Router Android/iOS shell, home and tournament screens, typed API client, reusable components, loading/error/empty states, and Android export.
-- **CI (validated):** Frozen install, formatting, Prisma validation/client generation, committed migration deployment to fresh PostgreSQL, typecheck, four test files with ten tests, all builds, Android export, and a compiled API health smoke test.
+- **CI (validated):** Frozen install, formatting, Prisma validation/client generation, committed migration deployment to fresh PostgreSQL, typecheck, six test files with twenty-eight tests, all builds, Android export, and a compiled API health smoke test.
 - **Deployment (planned):** No staging or production environment, domain, secrets, Android signing, monitoring, or store release is configured.
 
 ### Important fixes already completed

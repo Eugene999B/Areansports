@@ -36,7 +36,7 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Product, architecture, integrity, security, API, data, execution backlog, test strategy, moderation operations, and Ghana pilot documentation are committed.
 - The pnpm workspace, shared contracts, Prisma 7 database package, Fastify API, Expo mobile shell, tests, and CI are implemented as a runnable foundation.
 - `pnpm-lock.yaml` was generated in a clean GitHub-hosted environment and is enforced with frozen installation.
-- Formatting, Prisma validation, typecheck, ten automated tests, all package builds, Expo Android export, and compiled API startup pass on push and pull-request workflows.
+- Formatting, Prisma validation, typecheck, twenty-eight automated tests, all package builds, Expo Android export, and compiled API startup pass on push and pull-request workflows.
 - The exact validation evidence is recorded in `docs/VALIDATION.md`.
 - Draft pull request [#3](https://github.com/Eugene999B/Areansports/pull/3) tracks AS-02 on `agent/identity-sessions`.
 - ADR 0004 selects Supabase Auth; provider-neutral identity/session contracts and four tests are implemented and CI-validated.
@@ -98,6 +98,7 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Implemented provider-neutral JWT/JWKS verification with strict algorithm/key matching, issuer/audience/time validation, safe bearer errors, and ACTIVE account enforcement.
 - Added adversarial tests for malformed headers, expiry, future tokens, wrong issuer/audience, unknown key, unsupported algorithm, forged signature, suspended/deleted accounts, and provider-role injection.
 - Account provisioning and `/v1/me` are the next unfinished work; no live Supabase project or secret exists.
+- Validated authentication checkpoint `fe9cb94896015079736cc378931ca26ab5de2531`: push run 30114913020 and pull-request run 30114915564 passed.
 
 ### 2026-07-24 - foundation validation completed
 

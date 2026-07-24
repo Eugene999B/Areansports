@@ -1,5 +1,19 @@
 # Validation record
 
+## 2026-07-24 AS-02 authentication boundary checkpoint
+
+**Branch:** `agent/identity-sessions`  
+**Draft PR:** [#3](https://github.com/Eugene999B/Areansports/pull/3)  
+**Validated commit:** `fe9cb94896015079736cc378931ca26ab5de2531`  
+**Push CI:** [run 30114913020](https://github.com/Eugene999B/Areansports/actions/runs/30114913020)  
+**Pull-request CI:** [run 30114915564](https://github.com/Eugene999B/Areansports/actions/runs/30114915564)  
+**Result:** Passed
+
+The provider-neutral authentication boundary verifies asymmetric `RS256`, `ES256`, and `EdDSA` JWT signatures using constrained JWKS keys. It enforces exact issuer, audience allowlists, expiry, not-before, issued-at clock tolerance, token size/shape limits, bearer syntax, and `ACTIVE` ArenaSports account status. Provider claims never grant ArenaSports roles.
+
+Negative coverage rejects missing or malformed authorization, expired/future tokens, wrong issuer or audience, unknown keys, unsupported algorithms, forged signatures, suspended/deleted accounts, and provider-role injection. Production configuration fails closed unless issuer, audiences, and HTTPS JWKS URL are configured together. JWKS retrieval is bounded, HTTPS-only, cached, and refreshed conservatively.
+
+Both workflows passed frozen installation, formatting, Prisma validation, migration deployment to empty PostgreSQL, typecheck, six test files with twenty-eight tests, all builds including Android export, and compiled API smoke testing. No live Supabase project, credential, secret, account provisioning route, or `/v1/me` integration exists yet.
 ## 2026-07-24 AS-02 identity and migration checkpoint
 
 **Branch:** `agent/identity-sessions`  
