@@ -71,6 +71,15 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Format authentication test
+        run: pnpm exec prettier --write apps/api/test/authentication.test.ts
+
+      - name: Preserve formatted authentication test
+        uses: actions/upload-artifact@v7
+        with:
+          name: formatted-auth-test-${{ github.run_id }}
+          path: apps/api/test/authentication.test.ts
+          if-no-files-found: error
       - name: Check formatting
         run: pnpm format:check
 
