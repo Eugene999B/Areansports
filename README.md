@@ -47,7 +47,7 @@ Validation evidence:
 
 ### What is not implemented yet
 
-- Real account registration, authentication provider integration, recovery, refresh-session rotation, or session revocation.
+- Live Supabase project integration, account provisioning, recovery, refresh-session rotation, or session revocation.
 - Persisted user roles, profiles, security audit events, or authorization beyond the guarded demo boundary.
 - Game-profile ownership and normalization flows.
 - PostgreSQL-backed tournament lifecycle, immutable publication snapshots, registration, waitlists, fixtures, standings, or brackets.
@@ -64,9 +64,10 @@ Validation evidence:
 - Four identity tests cover normalization, ambiguous-character rejection, empty updates, and separation of provider identity from ArenaSports roles.
 - Prisma now models normalized handles, notification preferences, Supabase subject mappings, revocable role grants, and hashed provider-session metadata without storing provider tokens or passwords.
 - A reviewed baseline migration is committed and CI deploys it to a fresh PostgreSQL service on every push and pull request.
+- A provider-neutral Supabase JWT verifier enforces asymmetric signatures, key/algorithm matching, issuer, audience, token time claims, and local account status without trusting provider roles.
 - Push CI passed on the first AS-02 commit: [workflow 30112009004](https://github.com/Eugene999B/Areansports/actions/runs/30112009004).
 
-**First unfinished task:** implement Supabase JWT/JWKS verification with strict issuer/audience checks, account-status enforcement, and negative security tests. Do not add mobile sign-in screens until that server trust boundary passes.
+**First unfinished task:** add account provisioning and `/v1/me` using the verified provider subject, then profile updates, session listing/revocation, and redacted security audit events.
 
 ### Current slice: AS-02 identity and sessions
 
@@ -75,7 +76,7 @@ The next contributor should not jump directly to brackets, evidence, or social f
 1. Read `AGENTS.md`, `docs/HANDOFF.md`, `docs/VALIDATION.md`, and `docs/EXECUTION_BACKLOG.md`.
 2. Confirm the active branch and draft pull request still match this checkpoint.
 3. Treat ADR 0004, the provider-neutral contracts, identity persistence schema, and committed baseline migration as completed.
-4. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
+4. Treat JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests as implemented.
 5. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, redacted security audit events, and then mobile authentication states.
 6. Keep the first release free: do not add betting, wagering, entry fees, wallets, prize custody, or cash settlement.
 7. Do not scrape publishers, intercept game traffic, collect game passwords, or claim username matching is official result verification.

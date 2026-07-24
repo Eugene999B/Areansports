@@ -42,19 +42,19 @@ This branch should contain durable documentation, workspace tooling, database sc
 - ADR 0004 selects Supabase Auth; provider-neutral identity/session contracts and four tests are implemented and CI-validated.
 - Prisma persistence now includes normalized handles, notification preferences, provider identities, revocable role assignments, and hashed provider-session metadata.
 - The initial PostgreSQL migration is committed; CI applies it to a fresh database before typechecking, tests, builds, and the API smoke test.
+- The provider-neutral authentication module verifies Supabase asymmetric JWTs and denies invalid tokens plus suspended/deleted local accounts; it is not yet connected to a live project or `/v1/me`.
 - No Supabase project, production credentials, provider integration, staging environment, or mobile-store release exists yet.
 
 ## Next tasks in priority order
 
-1. Implement Supabase JWT/JWKS verification, issuer/audience allowlists, account-status enforcement, and negative security tests.
-2. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
-3. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
-4. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.
-5. Replace the in-memory tournament repository with PostgreSQL and implement versioned tournament publication.
-6. Add registration, waitlists, rules acknowledgement, and deterministic fixtures.
-7. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
-8. Configure a staging environment and Android internal testing.
-9. Run a closed Ghana community beta with documented moderation and support operations.
+1. Add account provisioning, `/v1/me`, profile updates, session listing/revocation, and redacted security audit events.
+2. Add Expo authentication state, encrypted persistence, recovery/deep-link screens, and Android device tests.
+3. Complete AS-03 game profiles without collecting game credentials or claiming publisher verification.
+4. Replace the in-memory tournament repository with PostgreSQL and implement versioned tournament publication.
+5. Add registration, waitlists, rules acknowledgement, and deterministic fixtures.
+6. Implement check-in, submissions, private evidence, result resolution, disputes, and audit trails.
+7. Configure a staging environment and Android internal testing.
+8. Run a closed Ghana community beta with documented moderation and support operations.
 
 ## Known blockers and risks
 
@@ -95,7 +95,9 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Passed the full push CI gate on workflow 30112009004.
 - Added the identity persistence schema and committed the cloud-generated initial PostgreSQL migration.
 - Verified migration deployment plus the complete CI gate on push run 30113466310 and pull-request run 30113468066.
-- JWT/JWKS verification and negative security tests are the next unfinished work.
+- Implemented provider-neutral JWT/JWKS verification with strict algorithm/key matching, issuer/audience/time validation, safe bearer errors, and ACTIVE account enforcement.
+- Added adversarial tests for malformed headers, expiry, future tokens, wrong issuer/audience, unknown key, unsupported algorithm, forged signature, suspended/deleted accounts, and provider-role injection.
+- Account provisioning and `/v1/me` are the next unfinished work; no live Supabase project or secret exists.
 
 ### 2026-07-24 - foundation validation completed
 

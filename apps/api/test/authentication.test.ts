@@ -1,9 +1,4 @@
-import {
-  createPrivateKey,
-  generateKeyPairSync,
-  sign,
-  type KeyObject,
-} from 'node:crypto';
+import { createPrivateKey, generateKeyPairSync, sign, type KeyObject } from 'node:crypto';
 import { describe, expect, it } from 'vitest';
 import {
   BearerAuthenticationService,
