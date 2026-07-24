@@ -9,7 +9,7 @@ The roadmap is organized by risk reduction. Dates should be added only when a st
 - **Implemented:** behavior exists with relevant tests.
 - **Verified:** tested in a production-like environment.
 
-## Phase 0 ? foundation
+## Phase 0 - foundation
 
 **Goal:** Make the project safe for multiple human and AI contributors.
 

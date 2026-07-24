@@ -3,10 +3,11 @@
 ## 2026-07-24 foundation branch
 
 **Branch:** `agent/platform-foundation`  
+**Draft PR:** [#1](https://github.com/Eugene999B/Areansports/pull/1)  
 **Workflow:** [CI run 30097444625](https://github.com/Eugene999B/Areansports/actions/runs/30097444625)  
 **Result:** Not executed
 
-GitHub created the workflow run, but the validation job did not start. GitHub reported: ?The job was not started because your account is locked due to a billing issue.?
+GitHub created the workflow run, but the validation job did not start. GitHub reported: "The job was not started because your account is locked due to a billing issue."
 
 This is an external account blocker, not evidence that the code passed or failed.
 

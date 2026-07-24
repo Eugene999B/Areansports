@@ -3,7 +3,7 @@
 **Last updated:** 2026-07-24  
 **Owner:** Eugene999B  
 **Active branch:** `agent/platform-foundation`  
-**Stage:** Foundation build
+**Stage:** Foundation build / draft review
 
 This file is the operational starting point for the next human developer or AI agent.
 
@@ -36,6 +36,7 @@ This branch should contain durable documentation, workspace tooling, database sc
 - Product direction captured from owner conversations.
 - GitHub owner authentication established.
 - Foundation branch created.
+- Draft pull request [#1](https://github.com/Eugene999B/Areansports/pull/1) opened against `main`.
 - Product, architecture, integrity, security, API, and data documentation are committed.
 - pnpm workspace, shared contracts, Prisma 7 database package, Fastify API, Expo mobile shell, tests, and CI are scaffolded.
 - GitHub Actions run 30097444625 did not start because GitHub reports the account is locked due to a billing issue.
@@ -45,17 +46,15 @@ This branch should contain durable documentation, workspace tooling, database sc
 ## Next tasks in priority order
 
 1. Resolve the GitHub Actions billing lock and rerun CI.
-2. Run a clean checkout/install/build and commit pnpm-lock.yaml.
+2. Run a clean checkout/install/build and commit `pnpm-lock.yaml`.
 3. Fix any validation failures and record exact results.
-4. Replace the in-memory tournament repository with PostgreSQL persistence.
+4. Replace the in-memory tournament repository with PostgreSQL persistence and migrations.
 5. Add real authentication and authorization.
-6. Implement tournament publication, ruleset snapshots, and registration.
-7. Implement deterministic fixtures and scoring.
-8. Implement match check-in, submissions, evidence, resolution, disputes, and audit trail.
-9. Add authentication and authorization.
-10. Implement persistent tournament creation and registration.
-11. Implement match check-in, submissions, evidence, resolution, disputes, and audit trail.
-12. Configure staging and Android internal testing.
+6. Implement tournament publication, versioned rulesets, and registration.
+7. Implement deterministic fixtures, scoring, standings, and bracket advancement.
+8. Implement match check-in, submissions, evidence, resolution, disputes, and audit trails.
+9. Configure a staging environment and Android internal testing.
+10. Run a closed Ghana community beta with documented moderation and support operations.
 
 ## Known blockers and risks
 
@@ -88,9 +87,9 @@ This branch should contain durable documentation, workspace tooling, database sc
 
 ## Session log
 
-### 2026-07-24 ? foundation initiated
+### 2026-07-24 - foundation initiated
 
 - Created `agent/platform-foundation`.
-- Began documentation and monorepo foundation.
+- Completed documentation and monorepo foundation scaffold.
 - Used direct GitHub API operations; no project repository was cloned locally.
-- Validation will be added after the runnable scaffold exists.
+- Opened draft PR #1; validation remains blocked by the GitHub account billing lock.
