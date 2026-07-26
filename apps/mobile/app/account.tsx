@@ -46,8 +46,36 @@ export default function AccountScreen() {
     if (status === 'authenticated') void loadSessions();
   }, [loadSessions, status]);
 
+  const performSignOut = async () => {
+    setSigningOut(true);
+    setScreenError(null);
+    try {
+      await signOut();
+    } catch (error: unknown) {
+      setScreenError(error instanceof Error ? error.message : 'Sign-out could not be completed.');
+    } finally {
+      setSigningOut(false);
+    }
+  };
+
   if (status === 'signedOut' || status === 'unavailable') return <Redirect href="/auth/sign-in" />;
   if (status === 'needsProfile') return <Redirect href="/auth/profile" />;
+
+  if (status === 'error') {
+    return (
+      <Screen>
+        <NoticeCard title="Your account could not be confirmed" tone="danger">
+          {errorMessage ?? 'Check your connection and try the account check again.'}
+        </NoticeCard>
+        <PrimaryButton label="Retry account check" onPress={() => void refresh()} />
+        <PrimaryButton
+          disabled={signingOut}
+          label={signingOut ? 'Signing out…' : 'Sign out on this device'}
+          onPress={() => void performSignOut()}
+        />
+      </Screen>
+    );
+  }
 
   if (status === 'loading' || !session || !user) {
     return (
@@ -67,18 +95,6 @@ export default function AccountScreen() {
       setScreenError(error instanceof Error ? error.message : 'The session could not be revoked.');
     } finally {
       setActionSessionId(null);
-    }
-  };
-
-  const performSignOut = async () => {
-    setSigningOut(true);
-    setScreenError(null);
-    try {
-      await signOut();
-    } catch (error: unknown) {
-      setScreenError(error instanceof Error ? error.message : 'Sign-out could not be completed.');
-    } finally {
-      setSigningOut(false);
     }
   };
 
@@ -158,9 +174,6 @@ export default function AccountScreen() {
         </View>
       ))}
 
-      {status === 'error' ? (
-        <PrimaryButton label="Retry account check" onPress={() => void refresh()} />
-      ) : null}
       <PrimaryButton
         disabled={signingOut}
         label={signingOut ? 'Signing out…' : 'Sign out on this device'}
