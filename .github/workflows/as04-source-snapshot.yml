@@ -59,8 +59,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Generate Prisma client
-        run: pnpm --filter @arenasports/database db:generate
+      - name: Validate Prisma schema and client
+        run: pnpm --filter @arenasports/database db:validate
 
       - name: Run strict typecheck
         id: typecheck
