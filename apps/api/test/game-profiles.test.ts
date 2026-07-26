@@ -5,10 +5,7 @@ import { InMemoryGameProfileRepository } from '../src/modules/game-profiles/repo
 import { GameProfileService } from '../src/modules/game-profiles/service.js';
 import { InMemoryIdentityRepository } from '../src/modules/identity/repository.js';
 import { IdentityService } from '../src/modules/identity/service.js';
-import type {
-  ExternalIdentityVerifier,
-  ExternalPrincipal,
-} from '../src/modules/identity/types.js';
+import type { ExternalIdentityVerifier, ExternalPrincipal } from '../src/modules/identity/types.js';
 
 class MutableVerifier implements ExternalIdentityVerifier {
   public principal: ExternalPrincipal = {
@@ -185,7 +182,9 @@ describe('game profile API', () => {
       method: 'POST',
       url: `/v1/game-profiles/${profileId}/ownership-challenges`,
       headers: authorization,
-      payload: { statement: 'This game identity belongs to me and I can provide supporting proof.' },
+      payload: {
+        statement: 'This game identity belongs to me and I can provide supporting proof.',
+      },
     });
     expect(first.statusCode).toBe(201);
     expect(first.json().data.status).toBe('OPEN');

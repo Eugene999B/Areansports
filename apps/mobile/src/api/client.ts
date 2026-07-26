@@ -56,9 +56,7 @@ export type AccountProfileInput = {
 
 export type GamePlatform = 'ANDROID' | 'IOS';
 export type GameProfileVerificationState =
-  | 'UNVERIFIED'
-  | 'COMMUNITY_CONFIRMED'
-  | 'AUTHORIZED_PROVIDER_VERIFIED';
+  'UNVERIFIED' | 'COMMUNITY_CONFIRMED' | 'AUTHORIZED_PROVIDER_VERIFIED';
 
 export type GameCatalogEntry = {
   id: string;
@@ -256,8 +254,9 @@ export function createGameProfileOwnershipChallenge(
   profileId: string,
   statement: string,
 ): Promise<GameProfileOwnershipChallenge> {
-  return requestData(
-    `/game-profiles/${encodeURIComponent(profileId)}/ownership-challenges`,
-    { accessToken, body: { statement }, method: 'POST' },
-  );
+  return requestData(`/game-profiles/${encodeURIComponent(profileId)}/ownership-challenges`, {
+    accessToken,
+    body: { statement },
+    method: 'POST',
+  });
 }

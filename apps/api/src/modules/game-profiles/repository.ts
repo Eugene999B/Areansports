@@ -116,7 +116,11 @@ export class InMemoryGameProfileRepository implements GameProfileRepository {
       throw new AppError('NOT_FOUND', 'The game profile was not found.', 404);
     }
     if (current.version !== input.version) {
-      throw new AppError('VERSION_CONFLICT', 'The game profile changed. Refresh and try again.', 409);
+      throw new AppError(
+        'VERSION_CONFLICT',
+        'The game profile changed. Refresh and try again.',
+        409,
+      );
     }
 
     const platform = input.platform ?? current.platform;

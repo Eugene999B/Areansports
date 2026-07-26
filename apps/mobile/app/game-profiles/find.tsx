@@ -52,7 +52,11 @@ export default function FindGameProfilesScreen() {
       setProfiles(result);
       setSearchedHandle(normalizedHandle);
     } catch (searchError: unknown) {
-      setError(searchError instanceof Error ? searchError.message : 'Player identities could not be loaded.');
+      setError(
+        searchError instanceof Error
+          ? searchError.message
+          : 'Player identities could not be loaded.',
+      );
     } finally {
       setLoading(false);
     }
@@ -69,7 +73,11 @@ export default function FindGameProfilesScreen() {
     setError(null);
     setSuccess(null);
     try {
-      await createGameProfileOwnershipChallenge(session.access_token, selected.id, statement.trim());
+      await createGameProfileOwnershipChallenge(
+        session.access_token,
+        selected.id,
+        statement.trim(),
+      );
       setSuccess(
         'Ownership review opened. Support will review evidence; this does not automatically remove or punish the other player.',
       );
@@ -91,8 +99,8 @@ export default function FindGameProfilesScreen() {
       <Text style={styles.eyebrow}>PLAYER IDENTITY LOOKUP</Text>
       <Text style={styles.title}>Find public game usernames by ArenaSports handle.</Text>
       <Text style={styles.body}>
-        These are player-supplied public identities. A matching name is not proof of game-account ownership
-        or publisher verification.
+        These are player-supplied public identities. A matching name is not proof of game-account
+        ownership or publisher verification.
       </Text>
 
       {error ? (
@@ -125,7 +133,8 @@ export default function FindGameProfilesScreen() {
 
       {searchedHandle && profiles.length === 0 && !loading ? (
         <NoticeCard title="No public identities found">
-          @{searchedHandle} may not exist, may have a private profile, or may have hidden all game identities.
+          @{searchedHandle} may not exist, may have a private profile, or may have hidden all game
+          identities.
         </NoticeCard>
       ) : null}
 
@@ -155,7 +164,9 @@ export default function FindGameProfilesScreen() {
               }}
             >
               <Text style={styles.challengeLink}>
-                {user?.handle === searchedHandle ? 'This is your ArenaSports profile' : 'Challenge ownership'}
+                {user?.handle === searchedHandle
+                  ? 'This is your ArenaSports profile'
+                  : 'Challenge ownership'}
               </Text>
             </Pressable>
           ) : (
@@ -170,8 +181,9 @@ export default function FindGameProfilesScreen() {
         <View style={styles.challengeCard}>
           <Text style={styles.cardTitle}>Open an ownership review</Text>
           <Text style={styles.help}>
-            Use this only when you reasonably believe “{selected.username}” belongs to you or is being used
-            to impersonate you. Do not include a password, login code, government ID, or private account data.
+            Use this only when you reasonably believe “{selected.username}” belongs to you or is
+            being used to impersonate you. Do not include a password, login code, government ID, or
+            private account data.
           </Text>
           <TextField
             editable={!submitting}
@@ -226,8 +238,19 @@ const styles = StyleSheet.create({
   username: { color: colors.primary, fontSize: 20, fontWeight: '900' },
   line: { color: colors.textMuted, fontSize: 14, lineHeight: 20 },
   help: { color: colors.textMuted, fontSize: 13, lineHeight: 20 },
-  challengeLink: { color: colors.primary, fontSize: 14, fontWeight: '800', paddingVertical: spacing.sm },
-  cancel: { color: colors.primary, fontSize: 14, fontWeight: '800', padding: spacing.sm, textAlign: 'center' },
+  challengeLink: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '800',
+    paddingVertical: spacing.sm,
+  },
+  cancel: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '800',
+    padding: spacing.sm,
+    textAlign: 'center',
+  },
   disclaimer: {
     color: colors.textMuted,
     fontSize: 12,

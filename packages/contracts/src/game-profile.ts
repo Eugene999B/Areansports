@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { EntityIdSchema, IsoDateTimeSchema } from './common.js';
 
-const UnsafeUsernameCharacterPattern = /[\u0000-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2066-\u2069]/u;
+const UnsafeUsernameCharacterPattern =
+  /[\u0000-\u001F\u007F\u200B-\u200F\u202A-\u202E\u2066-\u2069]/u;
 
 export const GameProfileVerificationStateSchema = z.enum([
   'UNVERIFIED',
@@ -48,7 +49,13 @@ export const GameUsernameSchema = z
 export const GameRegionSchema = z
   .string()
   .transform(normalizeGameRegion)
-  .pipe(z.string().min(2).max(16).regex(/^[A-Z0-9_-]+$/));
+  .pipe(
+    z
+      .string()
+      .min(2)
+      .max(16)
+      .regex(/^[A-Z0-9_-]+$/),
+  );
 
 export const GameCatalogEntrySchema = z.object({
   id: EntityIdSchema,
@@ -130,9 +137,7 @@ export const GameProfileOwnershipChallengeSchema = z.object({
   updatedAt: IsoDateTimeSchema,
 });
 
-export type GameProfileVerificationState = z.infer<
-  typeof GameProfileVerificationStateSchema
->;
+export type GameProfileVerificationState = z.infer<typeof GameProfileVerificationStateSchema>;
 export type GamePlatform = z.infer<typeof GamePlatformSchema>;
 export type GameCatalogEntry = z.infer<typeof GameCatalogEntrySchema>;
 export type CreateGameProfileInput = z.infer<typeof CreateGameProfileSchema>;
@@ -142,6 +147,4 @@ export type PublicGameProfile = z.infer<typeof PublicGameProfileSchema>;
 export type CreateGameProfileOwnershipChallengeInput = z.infer<
   typeof CreateGameProfileOwnershipChallengeSchema
 >;
-export type GameProfileOwnershipChallenge = z.infer<
-  typeof GameProfileOwnershipChallengeSchema
->;
+export type GameProfileOwnershipChallenge = z.infer<typeof GameProfileOwnershipChallengeSchema>;

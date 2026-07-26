@@ -57,7 +57,9 @@ export default function GameProfilesScreen() {
         setGameSlug(nextGames[0]?.slug ?? 'efootball');
       }
     } catch (loadError: unknown) {
-      setError(loadError instanceof Error ? loadError.message : 'Game identities could not be loaded.');
+      setError(
+        loadError instanceof Error ? loadError.message : 'Game identities could not be loaded.',
+      );
     } finally {
       setLoading(false);
     }
@@ -134,7 +136,9 @@ export default function GameProfilesScreen() {
       await load();
     } catch (submitError: unknown) {
       setError(
-        submitError instanceof Error ? submitError.message : 'The game identity could not be saved.',
+        submitError instanceof Error
+          ? submitError.message
+          : 'The game identity could not be saved.',
       );
     } finally {
       setSubmitting(false);
@@ -146,8 +150,8 @@ export default function GameProfilesScreen() {
       <Text style={styles.eyebrow}>PUBLIC GAME IDENTITIES</Text>
       <Text style={styles.title}>Link how opponents find you in-game.</Text>
       <Text style={styles.body}>
-        Enter only the public username visible in eFootball or FC Mobile. ArenaSports never needs your
-        game password, login code, account cookie, or recovery details.
+        Enter only the public username visible in eFootball or FC Mobile. ArenaSports never needs
+        your game password, login code, account cookie, or recovery details.
       </Text>
 
       {error ? (
@@ -253,7 +257,8 @@ export default function GameProfilesScreen() {
           <Text style={styles.help}>{verificationCopy(profile)}</Text>
           {profile.openOwnershipChallengeCount > 0 ? (
             <NoticeCard title="Ownership review open">
-              Support will review the challenge. The profile remains labelled accurately during review.
+              Support will review the challenge. The profile remains labelled accurately during
+              review.
             </NoticeCard>
           ) : null}
           <Pressable accessibilityRole="button" onPress={() => beginEdit(profile)}>
@@ -294,7 +299,13 @@ const styles = StyleSheet.create({
   },
   switchCopy: { flex: 1, gap: spacing.xs },
   help: { color: colors.textMuted, fontSize: 13, lineHeight: 19 },
-  cancel: { color: colors.primary, fontSize: 14, fontWeight: '800', padding: spacing.sm, textAlign: 'center' },
+  cancel: {
+    color: colors.primary,
+    fontSize: 14,
+    fontWeight: '800',
+    padding: spacing.sm,
+    textAlign: 'center',
+  },
   sectionTitle: { color: colors.text, fontSize: 22, fontWeight: '900', marginTop: spacing.md },
   card: {
     backgroundColor: colors.surface,
