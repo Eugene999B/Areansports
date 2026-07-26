@@ -3,10 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { buildServer } from '../src/server.js';
 import { InMemoryIdentityRepository } from '../src/modules/identity/repository.js';
 import { IdentityService } from '../src/modules/identity/service.js';
-import type {
-  ExternalIdentityVerifier,
-  ExternalPrincipal,
-} from '../src/modules/identity/types.js';
+import type { ExternalIdentityVerifier, ExternalPrincipal } from '../src/modules/identity/types.js';
 
 class MutableVerifier implements ExternalIdentityVerifier {
   public principal: ExternalPrincipal = {
