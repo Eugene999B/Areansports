@@ -1,0 +1,28 @@
+name: AS-04 source snapshot
+
+on:
+  push:
+    branches:
+      - agent/as-04-tournament-lifecycle
+
+permissions:
+  contents: read
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v7
+
+      - name: Upload source tree
+        uses: actions/upload-artifact@v7
+        with:
+          name: arenasports-as04-source
+          path: |
+            .
+            !.git/**
+            !node_modules/**
+          include-hidden-files: true
+          retention-days: 1
