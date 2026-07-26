@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -56,6 +56,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -71,21 +73,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Format workspace for artifact
+      - name: Format workspace
         run: pnpm format
 
-      - name: Collect formatted files
+      - name: Commit pinned formatting
+        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/as-03-game-profiles'
         run: |
-          mkdir -p /tmp/arenasports-format
-          git diff --name-only > /tmp/arenasports-format/files.txt
-          git diff --name-only -z | tar --null -T - -cf /tmp/arenasports-format/formatted-files.tar
-
-      - name: Upload formatted files
-        uses: actions/upload-artifact@v4
-        with:
-          name: arenasports-as03-formatted-files
-          path: /tmp/arenasports-format
-          retention-days: 3
+          if ! git diff --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add .
+            git commit -m "Format AS-03 game profile implementation"
+            git push origin HEAD:${GITHUB_REF_NAME}
+          fi
 
       - name: Check formatting
         run: pnpm format:check
