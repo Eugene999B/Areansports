@@ -121,19 +121,22 @@ describe('Prisma identity repository', () => {
   it.each([
     ['SUSPENDED', 'ACCOUNT_SUSPENDED'],
     ['DELETED', 'ACCOUNT_DELETED'],
-  ] as const)('denies %s accounts after provider authentication', async (accountStatus, errorCode) => {
-    const suffix = randomUUID();
-    const principal = buildPrincipal(suffix);
-    const prefix = accountStatus === 'SUSPENDED' ? 'sus' : 'del';
-    const user = await createAccount(
-      suffix,
-      `${prefix}_${suffix.replaceAll('-', '').slice(0, 12)}`,
-    );
-    await database.user.update({ where: { id: user.id }, data: { status: accountStatus } });
+  ] as const)(
+    'denies %s accounts after provider authentication',
+    async (accountStatus, errorCode) => {
+      const suffix = randomUUID();
+      const principal = buildPrincipal(suffix);
+      const prefix = accountStatus === 'SUSPENDED' ? 'sus' : 'del';
+      const user = await createAccount(
+        suffix,
+        `${prefix}_${suffix.replaceAll('-', '').slice(0, 12)}`,
+      );
+      await database.user.update({ where: { id: user.id }, data: { status: accountStatus } });
 
-    const service = new IdentityService(new FixedVerifier(principal), repository);
-    await expect(
-      service.authenticate('test-token', { requestId: `test-${randomUUID()}` }),
-    ).rejects.toMatchObject({ code: errorCode });
-  });
+      const service = new IdentityService(new FixedVerifier(principal), repository);
+      await expect(
+        service.authenticate('test-token', { requestId: `test-${randomUUID()}` }),
+      ).rejects.toMatchObject({ code: errorCode });
+    },
+  );
 });
