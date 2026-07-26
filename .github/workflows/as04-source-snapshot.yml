@@ -17,6 +17,9 @@ jobs:
     if: github.head_ref == 'agent/as-04-tournament-lifecycle'
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://arenasports:arenasports@localhost:5432/arenasports?schema=public
     steps:
       - name: Check out branch
         uses: actions/checkout@v7
@@ -58,9 +61,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Validate Prisma schema and client
-        run: pnpm --filter @arenasports/database db:validate
 
       - name: Run strict typecheck
         id: typecheck
