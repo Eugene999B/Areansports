@@ -95,18 +95,50 @@ Remaining AS-02 release gates:
 
 **Outcome:** A player links a public eFootball or FC Mobile identity without sharing game credentials.
 
-Deliverables:
+**Status:** Implemented and clean-CI validated on branch `agent/as-03-game-profiles`. Real-device interaction, staff ownership-resolution operations, evidence procedure, and support/privacy readiness remain release gates.
 
-- game, platform, region, username, and normalized username;
-- duplicate and impersonation safeguards;
-- visibility controls and ownership challenge policy;
-- clear `UNVERIFIED`, `COMMUNITY_CONFIRMED`, and future provider states.
+Implemented deliverables:
 
-Acceptance:
+- eFootball and EA SPORTS FC Mobile catalogue seeded by migration;
+- Android/iOS platform, game region, public username, and normalized comparison value;
+- Unicode NFKC, casing, whitespace, control, zero-width, and bidirectional-spoof safeguards;
+- one normalized username per game/platform/region;
+- one profile slot per player/game/platform/region;
+- `UNVERIFIED`, `COMMUNITY_CONFIRMED`, and reserved `AUTHORIZED_PROVIDER_VERIFIED` truth labels;
+- client prohibition on setting verification state;
+- per-profile visibility and privacy-preserving public handle lookup;
+- optimistic versions for concurrent edits;
+- private ownership-challenge creation with self/duplicate protection;
+- transaction-backed profile/challenge audit events;
+- authenticated API and mobile management screens;
+- public mobile lookup plus sign-in-gated challenge flow;
+- committed `20260726110000_game_profiles` migration applied after the baseline from zero in CI;
+- contract, API, repository, policy, and PostgreSQL integration tests;
+- durable truth and ownership policy in `docs/GAME_PROFILE_POLICY.md`.
 
-- the UI never calls a matching username publisher-verified;
-- ArenaSports never requests a game password;
-- normalization and uniqueness are tested across casing and whitespace.
+Acceptance evidence:
+
+- every new profile starts `UNVERIFIED`;
+- the UI never calls username matching publisher verification;
+- `COMMUNITY_CONFIRMED` is explicitly described as an ArenaSports community process;
+- ArenaSports never requests a game password, login code, cookie, or recovery credential;
+- NFKC/case/whitespace duplicates are rejected;
+- invisible and bidirectional spoofing characters are rejected;
+- a player cannot occupy the same game/platform/region slot twice;
+- hidden, suspended, deleted, or private profiles do not appear in public lookup;
+- stale profile updates return `VERSION_CONFLICT`;
+- opening a challenge does not automatically hide, transfer, remove, suspend, punish, or change a truth label;
+- duplicate and self ownership challenges are rejected;
+- both migrations, Android export, tests, and compiled API smoke pass in clean CI.
+
+Remaining AS-03 release gates:
+
+- exercise create/edit/hide/lookup/challenge flows on Android emulator and physical devices;
+- complete accessibility, large-font, screen-reader, low-memory, and Ghana-network checks;
+- define the least-sensitive allowed ownership evidence and prohibited evidence list in support training;
+- approve challenge retention, deletion, appeal, and privacy procedures;
+- implement privileged claim/resolution operations with stronger authentication, role scope, conflict checks, reason codes, and audit;
+- test abuse rate limits, duplicate-case support handling, and notification safety.
 
 ### AS-04 - Tournament draft and publication
 
@@ -190,7 +222,7 @@ Acceptance:
 
 Deliverables:
 
-- score submission from each participant's perspective;
+- score submission from each participant’s perspective;
 - opponent confirmation and compatible-submission resolution;
 - private presigned evidence upload, size/type validation, malware state, digest, and retention metadata;
 - suspicion flags that assist rather than silently decide guilt;
@@ -238,69 +270,3 @@ Acceptance:
 
 - deadline reminders are deduplicated;
 - notification failure cannot roll back competition truth;
-- discovery results do not expose private tournaments or hidden profiles;
-- every notification answers what happened, what action is useful, and when it is due.
-
-### AS-11 - Moderation and platform operations
-
-**Outcome:** A trained team can operate a pilot without direct database edits.
-
-Deliverables:
-
-- scoped moderator queues and case views;
-- reports, blocks, sanctions, appeals, and emergency containment;
-- organizer trust signals and privileged-action review;
-- operational dashboards, alerts, audit export, and incident runbooks;
-- retention and deletion request workflow.
-
-Acceptance:
-
-- moderators access only the minimum evidence required;
-- every privileged action records actor, reason, target, and correlation ID;
-- high-severity safety reports have an escalation path;
-- support can resolve common cases without engineering database changes.
-
-### AS-12 - Ghana closed pilot
-
-**Outcome:** A controlled community cohort completes real tournaments safely.
-
-Deliverables and gates are defined in `docs/GHANA_LAUNCH_PLAN.md`.
-
-## Cross-cutting work required in every slice
-
-- authorization matrix update;
-- API contract and error-code update;
-- mobile loading, empty, offline, retry, and error states;
-- audit and observability events;
-- data-retention classification;
-- accessibility and low-bandwidth review;
-- abuse case and recovery behaviour;
-- documentation and handoff update.
-
-## Definition of ready
-
-A work item is ready only when it has:
-
-- a named user outcome;
-- applicable ruleset or policy references;
-- API and data impact;
-- authorization and abuse analysis;
-- observable acceptance criteria;
-- test cases and rollback/recovery notes;
-- no unresolved product decision that changes the core behaviour.
-
-## Definition of done
-
-A work item is done only when:
-
-- code, migration, tests, and documentation are reviewed;
-- automated checks pass in a clean environment;
-- permissions and audit events are verified;
-- mobile behaviour is exercised on a real or emulated Android device when applicable;
-- monitoring and support behaviour exist for new failure modes;
-- `docs/HANDOFF.md` and `docs/VALIDATION.md` reflect reality;
-- planned, scaffolded, implemented, and verified labels are used accurately.
-
-## Issue creation order
-
-Create implementation issues only after AS-01 passes. AS-02 through AS-05 should remain small enough to merge independently and link back to the relevant slice. Do not open dozens of speculative leaf issues before contracts and provider decisions are verified.
