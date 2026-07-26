@@ -84,7 +84,22 @@ jobs:
         run: pnpm typecheck
 
       - name: Test
-        run: pnpm test
+        id: tests
+        continue-on-error: true
+        run: pnpm test > /tmp/arenasports-tests.log 2>&1
+
+      - name: Upload test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: arenasports-test-diagnostics
+          path: /tmp/arenasports-tests.log
+          if-no-files-found: error
+          retention-days: 3
+
+      - name: Enforce test result
+        if: steps.tests.outcome == 'failure'
+        run: exit 1
 
       - name: Build
         run: pnpm build
