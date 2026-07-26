@@ -4,6 +4,12 @@ export const EntityIdSchema = z.string().min(1).max(64);
 export const IsoDateTimeSchema = z.string().datetime({ offset: true });
 export const CountryCodeSchema = z.string().regex(/^[A-Z]{2}$/);
 export const TimeZoneSchema = z.string().min(1).max(100);
+export const IdempotencyKeySchema = z
+  .string()
+  .trim()
+  .min(8)
+  .max(128)
+  .regex(/^[A-Za-z0-9._:-]+$/);
 
 export const PageQuerySchema = z.object({
   cursor: z.string().min(1).optional(),
@@ -36,6 +42,10 @@ export const ApiErrorCodeSchema = z.enum([
   'GAME_PROFILE_USERNAME_TAKEN',
   'GAME_PROFILE_SLOT_TAKEN',
   'OWNERSHIP_CHALLENGE_EXISTS',
+  'TOURNAMENT_NOT_EDITABLE',
+  'TOURNAMENT_NOT_PUBLISHABLE',
+  'TOURNAMENT_NOT_CANCELLABLE',
+  'TOURNAMENT_NOT_VISIBLE',
   'TOURNAMENT_NOT_JOINABLE',
   'TOURNAMENT_CAPACITY_REACHED',
   'MATCH_ACTION_NOT_ALLOWED',

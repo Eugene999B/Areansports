@@ -11,6 +11,7 @@ import { InMemoryIdentityRepository } from './modules/identity/repository.js';
 import { identityRoutes } from './modules/identity/routes.js';
 import { IdentityService } from './modules/identity/service.js';
 import { DisabledIdentityVerifier, SupabaseIdentityVerifier } from './modules/identity/verifier.js';
+import { PrismaTournamentRepository } from './modules/tournaments/prisma-repository.js';
 import { InMemoryTournamentRepository } from './modules/tournaments/repository.js';
 import { tournamentRoutes } from './modules/tournaments/routes.js';
 import { TournamentService } from './modules/tournaments/service.js';
@@ -45,6 +46,14 @@ async function buildDefaultGameProfileService(config: AppConfig): Promise<GamePr
   }
   const { database } = await import('@arenasports/database');
   return new GameProfileService(new PrismaGameProfileRepository(database));
+}
+
+async function buildDefaultTournamentService(config: AppConfig): Promise<TournamentService> {
+  if (!config.supabaseUrl || !config.supabasePublishableKey) {
+    return new TournamentService(new InMemoryTournamentRepository());
+  }
+  const { database } = await import('@arenasports/database');
+  return new TournamentService(new PrismaTournamentRepository(database));
 }
 
 export async function buildServer(options: BuildServerOptions): Promise<FastifyInstance> {
@@ -99,7 +108,7 @@ export async function buildServer(options: BuildServerOptions): Promise<FastifyI
   const gameProfileService =
     options.gameProfileService ?? (await buildDefaultGameProfileService(options.config));
   const tournamentService =
-    options.tournamentService ?? new TournamentService(new InMemoryTournamentRepository());
+    options.tournamentService ?? (await buildDefaultTournamentService(options.config));
 
   await app.register(healthRoutes, { prefix: '/health' });
   await app.register(identityRoutes, { prefix: '/v1', service: identityService });
@@ -109,7 +118,7 @@ export async function buildServer(options: BuildServerOptions): Promise<FastifyI
     identityService,
   });
   await app.register(tournamentRoutes, {
-    prefix: '/v1/tournaments',
+    prefix: '/v1',
     service: tournamentService,
     identityService,
     enableDemoAuth: options.config.enableDemoAuth,

@@ -61,9 +61,14 @@ export default function HomeScreen() {
       )}
 
       {canOrganize ? (
-        <Link href="/create-tournament" style={styles.secondaryLink}>
-          Create a free tournament
-        </Link>
+        <>
+          <Link href="/organizer/tournaments" style={styles.secondaryLink}>
+            Manage your tournaments
+          </Link>
+          <Link href="/create-tournament" style={styles.secondaryLink}>
+            Create a free tournament
+          </Link>
+        </>
       ) : null}
 
       <View style={styles.trustCard}>

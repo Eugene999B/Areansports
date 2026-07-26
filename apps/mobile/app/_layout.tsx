@@ -25,6 +25,14 @@ export default function RootLayout() {
           <Stack.Screen name="game-profiles/find" options={{ title: 'Find player identities' }} />
           <Stack.Screen name="tournaments/index" options={{ title: 'Find tournaments' }} />
           <Stack.Screen name="tournaments/[id]" options={{ title: 'Tournament' }} />
+          <Stack.Screen
+            name="organizer/tournaments/index"
+            options={{ title: 'Your tournaments' }}
+          />
+          <Stack.Screen
+            name="organizer/tournaments/[id]"
+            options={{ title: 'Manage tournament' }}
+          />
           <Stack.Screen name="create-tournament" options={{ title: 'Create tournament' }} />
         </Stack>
       </AuthProvider>

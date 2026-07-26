@@ -71,6 +71,15 @@ enum TournamentFormat {
   DOUBLE_ELIMINATION
 }
 
+enum TournamentCancellationReason {
+  ORGANIZER_UNAVAILABLE
+  INSUFFICIENT_PARTICIPANTS
+  SCHEDULE_CONFLICT
+  TECHNICAL_ISSUE
+  SAFETY_CONCERN
+  OTHER
+}
+
 enum RegistrationStatus {
   PENDING
   ACCEPTED
@@ -153,6 +162,7 @@ model User {
   gameProfileChallengesOpened   GameProfileOwnershipChallenge[] @relation("GameProfileChallengeChallenger")
   gameProfileChallengesResolved GameProfileOwnershipChallenge[] @relation("GameProfileChallengeResolver")
   organized                     Tournament[]                     @relation("TournamentOrganizer")
+  cancelledTournaments          Tournament[]                     @relation("TournamentCanceller")
   registrations                 TournamentRegistration[]
   participants                  TournamentParticipant[]
   evidence                      Evidence[]
@@ -275,30 +285,38 @@ model GameProfileOwnershipChallenge {
 }
 
 model Tournament {
-  id                   String               @id @default(cuid())
-  organizerId          String
-  gameId               String
-  activeRulesetId      String?              @unique
-  title                String
-  slug                 String               @unique
-  description          String               @default("")
-  platform             String
-  region               String
-  timezone             String
-  visibility           TournamentVisibility
-  format               TournamentFormat
-  status               TournamentStatus     @default(DRAFT)
-  capacity             Int
-  registrationOpensAt  DateTime
-  registrationClosesAt DateTime
-  startsAt             DateTime
-  completedAt          DateTime?
-  version              Int                  @default(1)
-  createdAt            DateTime             @default(now())
-  updatedAt            DateTime             @updatedAt
+  id                      String                        @id @default(cuid())
+  organizerId             String
+  gameId                  String
+  draftRulesetId          String?                       @unique
+  activeRulesetId         String?                       @unique
+  cancelledById           String?
+  title                   String
+  slug                    String                        @unique
+  description             String                        @default("")
+  platform                GamePlatform
+  region                  String
+  timezone                String
+  visibility              TournamentVisibility
+  format                  TournamentFormat
+  status                  TournamentStatus              @default(DRAFT)
+  capacity                Int
+  registrationOpensAt     DateTime
+  registrationClosesAt    DateTime
+  startsAt                DateTime
+  publishedAt             DateTime?
+  cancelledAt             DateTime?
+  cancellationReasonCode  TournamentCancellationReason?
+  cancellationExplanation String?
+  completedAt             DateTime?
+  version                 Int                           @default(1)
+  createdAt               DateTime                      @default(now())
+  updatedAt               DateTime                      @updatedAt
 
   organizer     User                     @relation("TournamentOrganizer", fields: [organizerId], references: [id], onDelete: Restrict)
+  cancelledBy   User?                    @relation("TournamentCanceller", fields: [cancelledById], references: [id], onDelete: SetNull)
   game          Game                     @relation(fields: [gameId], references: [id], onDelete: Restrict)
+  draftRuleset  RulesetVersion?          @relation("DraftRuleset", fields: [draftRulesetId], references: [id], onDelete: SetNull)
   activeRuleset RulesetVersion?          @relation("ActiveRuleset", fields: [activeRulesetId], references: [id], onDelete: SetNull)
   rulesets      RulesetVersion[]         @relation("TournamentRulesets")
   registrations TournamentRegistration[]
@@ -308,7 +326,8 @@ model Tournament {
 
   @@index([status, startsAt])
   @@index([gameId, visibility, status])
-  @@index([organizerId])
+  @@index([organizerId, updatedAt])
+  @@index([publishedAt, visibility, status, startsAt])
 }
 
 model RulesetVersion {
@@ -318,15 +337,33 @@ model RulesetVersion {
   schemaVersion Int
   contentDigest String
   rules         Json
+  renderedRules String
   publishedAt   DateTime?
   createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  tournament   Tournament              @relation("TournamentRulesets", fields: [tournamentId], references: [id], onDelete: Cascade)
-  activeFor    Tournament?             @relation("ActiveRuleset")
+  tournament    Tournament              @relation("TournamentRulesets", fields: [tournamentId], references: [id], onDelete: Cascade)
+  draftFor      Tournament?             @relation("DraftRuleset")
+  activeFor     Tournament?             @relation("ActiveRuleset")
   registrations TournamentRegistration[]
   fixtures      Fixture[]
 
   @@unique([tournamentId, version])
+  @@index([tournamentId, publishedAt])
+}
+
+model IdempotencyReceipt {
+  id             String   @id @default(cuid())
+  actorId        String
+  action         String
+  idempotencyKey String
+  requestDigest  String
+  responseBody   Json
+  createdAt      DateTime @default(now())
+  expiresAt      DateTime
+
+  @@unique([actorId, action, idempotencyKey])
+  @@index([expiresAt])
 }
 
 model TournamentRegistration {
