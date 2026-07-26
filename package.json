@@ -10,7 +10,7 @@
     "node": ">=22.13.0"
   },
   "scripts": {
-    "prepare:workspace": "pnpm --filter @arenasports/contracts build && pnpm --filter @arenasports/database db:generate",
+    "prepare:workspace": "pnpm --filter @arenasports/contracts build && pnpm --filter @arenasports/database build",
     "dev": "pnpm prepare:workspace && pnpm --parallel --filter @arenasports/api --filter @arenasports/mobile dev",
     "dev:api": "pnpm prepare:workspace && pnpm --filter @arenasports/api dev",
     "dev:mobile": "pnpm --filter @arenasports/mobile dev",
