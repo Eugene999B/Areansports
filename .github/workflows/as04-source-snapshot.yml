@@ -56,8 +56,19 @@ jobs:
           ref: agent/as-04-tournament-lifecycle
           fetch-depth: 0
 
+      - name: Capture transfer chunks
+        uses: actions/upload-artifact@v7
+        with:
+          name: as04-transfer-chunks
+          path: scripts/as04-patch-*.b64
+          retention-days: 1
+
       - name: Reconstruct and verify implementation bundle
         run: |
+          echo "b99e136a72dbbc29f0055e788650588c2f9d395ebfd0dd2657da0f0eee822bad  scripts/as04-patch-00.b64" | sha256sum --check --strict
+          echo "2a815f4bf4213257ab03d5dd853d16ce522192d6a0800d399726185afdcf73fd  scripts/as04-patch-01.b64" | sha256sum --check --strict
+          echo "3b5b7f873350c871ebb94011d17ecba8ecca552b54340da0e232d60a09e9f49f  scripts/as04-patch-02.b64" | sha256sum --check --strict
+          echo "d992ef589aaab641e999b620d5610a260f74bb68f4ab3d30cdacba8ffe23f754  scripts/as04-patch-03.b64" | sha256sum --check --strict
           cat scripts/as04-patch-00.b64 scripts/as04-patch-01.b64 scripts/as04-patch-02.b64 scripts/as04-patch-03.b64 > /tmp/as04-changes.tar.gz.b64
           base64 --decode /tmp/as04-changes.tar.gz.b64 > /tmp/as04-changes.tar.gz
           echo "cf1758a4217d41cb8f850fe262a8339c244398d5930687c246df78da77c297e0  /tmp/as04-changes.tar.gz" | sha256sum --check --strict
