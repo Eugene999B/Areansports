@@ -1,13 +1,13 @@
 # ArenaSports execution backlog
 
-This backlog turns the product requirements into implementable vertical slices. It is the default sequencing guide after the foundation branch passes validation. GitHub issues may mirror these identifiers, but this file owns dependencies and release gates.
+This backlog turns the product requirements into implementable vertical slices. It owns dependency order and release gates even when GitHub issues mirror the identifiers.
 
 ## Working rules
 
 - Build one end-to-end user outcome at a time: contract, domain rule, persistence, authorization, API, mobile state, audit, and tests.
 - Do not mark a slice implemented when only its interface or database shape exists.
 - Every retryable mutation requires an idempotency key and duplicate-request test.
-- Every competition-truth mutation requires authorization, an audit event, and a reason where judgment is involved.
+- Every competition-truth mutation requires authorization, an audit event, and a reason where judgement is involved.
 - Published rules are immutable. Corrections create versions; they do not erase history.
 - Money, wagering, prize custody, and publisher-unapproved result scraping remain excluded.
 
@@ -51,23 +51,45 @@ Acceptance:
 
 ### AS-02 - Account and session foundation
 
-**Outcome:** A player can create an ArenaSports account, sign in, sign out, and recover access.
+**Outcome:** A player can create an ArenaSports account, sign in, sign out, and recover access through the selected provider boundary.
 
-Deliverables:
+**Status:** Implemented and clean-CI validated on branch `agent/as-02-identity-sessions`. Live Supabase/SMTP and Android interaction checks remain release gates; stronger moderator/administrator authentication and privileged role-management operations remain follow-up.
 
-- select an authentication provider through an ADR;
-- verified email or phone flow appropriate for the pilot;
-- short-lived access session and rotating/revocable refresh session;
-- account status enforcement and session list/revocation;
-- profile handle, display name, country, timezone, and notification preferences;
-- audit events for security-sensitive changes.
+Implemented deliverables:
 
-Acceptance:
+- Supabase Auth provider selected through ADR 0002;
+- verified email OTP flow for the pilot; phone authentication deliberately disabled;
+- provider access tokens validated remotely and mapped to stable ArenaSports users;
+- secure native provider-session persistence through Expo SecureStore;
+- local observed-session inventory and revocation deny-list;
+- profile handle, display name, country, timezone, avatar field, visibility, and notification preferences;
+- `ACTIVE`, `SUSPENDED`, and `DELETED` account enforcement;
+- `PLAYER`, `ORGANIZER`, `MODERATOR`, and `ADMINISTRATOR` platform-role separation;
+- transactional user, external identity, role, session, and audit persistence;
+- account bootstrap, `/me`, profile update, session list/revoke APIs;
+- mobile sign-in, code verification, onboarding, account, error, retry, and sign-out states;
+- committed PostgreSQL baseline migration deployed from zero in CI;
+- contract, verifier, API, role-policy, and database integration tests.
 
-- duplicate handles and normalized identities are rejected safely;
-- suspended/deleted users cannot create privileged sessions;
-- authorization tests cover player, organizer, moderator, and administrator roles;
-- secrets and tokens never appear in logs.
+Acceptance evidence:
+
+- duplicate normalized handles and provider identities are rejected safely;
+- unverified email cannot bootstrap a pilot account;
+- suspended and deleted users cannot establish authenticated ArenaSports requests;
+- locally revoked provider session IDs are denied;
+- player, organizer, moderator, and administrator role boundaries are tested;
+- provider failures return safe retryable errors;
+- authorization/cookie headers are redacted and raw tokens are never persisted;
+- Android export and compiled API smoke pass in clean CI.
+
+Remaining AS-02 release gates:
+
+- configure a non-production Supabase project and production-quality SMTP;
+- verify OTP template, rate limits, abuse controls, and recovery support;
+- exercise emulator and physical-device flows, secure-store restoration, accessibility, and low-bandwidth behaviour;
+- approve provider region, processor terms, Ghana privacy readiness, and age model;
+- require stronger authentication for moderator/administrator operations;
+- add audited privileged role-assignment/revocation operations.
 
 ### AS-03 - Game profiles
 
@@ -152,7 +174,7 @@ Deliverables:
 - match reference, opponent identity, rules summary, and deadline;
 - check-in with server timestamps;
 - availability proposals and acceptance;
-- reminder schedule and connectivity-safe retry behavior;
+- reminder schedule and connectivity-safe retry behaviour;
 - event timeline visible to both participants.
 
 Acceptance:
@@ -247,12 +269,12 @@ Deliverables and gates are defined in `docs/GHANA_LAUNCH_PLAN.md`.
 ## Cross-cutting work required in every slice
 
 - authorization matrix update;
-- API contract and error code update;
+- API contract and error-code update;
 - mobile loading, empty, offline, retry, and error states;
 - audit and observability events;
-- data retention classification;
+- data-retention classification;
 - accessibility and low-bandwidth review;
-- abuse case and recovery behavior;
+- abuse case and recovery behaviour;
 - documentation and handoff update.
 
 ## Definition of ready
@@ -265,7 +287,7 @@ A work item is ready only when it has:
 - authorization and abuse analysis;
 - observable acceptance criteria;
 - test cases and rollback/recovery notes;
-- no unresolved product decision that changes the core behavior.
+- no unresolved product decision that changes the core behaviour.
 
 ## Definition of done
 
@@ -274,11 +296,11 @@ A work item is done only when:
 - code, migration, tests, and documentation are reviewed;
 - automated checks pass in a clean environment;
 - permissions and audit events are verified;
-- mobile behavior is exercised on a real or emulated Android device when applicable;
-- monitoring and support behavior exist for new failure modes;
+- mobile behaviour is exercised on a real or emulated Android device when applicable;
+- monitoring and support behaviour exist for new failure modes;
 - `docs/HANDOFF.md` and `docs/VALIDATION.md` reflect reality;
 - planned, scaffolded, implemented, and verified labels are used accurately.
 
 ## Issue creation order
 
-Create implementation issues only after AS-01 passes. The first issue set should be AS-02 through AS-05, with each issue small enough to merge independently and linked to its parent slice. Do not open dozens of speculative leaf issues before the contracts and provider decisions are verified.
+Create implementation issues only after AS-01 passes. AS-02 through AS-05 should remain small enough to merge independently and link back to the relevant slice. Do not open dozens of speculative leaf issues before contracts and provider decisions are verified.
