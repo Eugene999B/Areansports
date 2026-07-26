@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - agent/as-04-tournament-lifecycle
+  pull_request:
+    branches:
+      - agent/as-03-game-profiles
 
 permissions:
   contents: read
