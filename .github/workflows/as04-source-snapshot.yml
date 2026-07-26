@@ -17,7 +17,16 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: agent/as-04-tournament-lifecycle
-      - name: Print overlay checksums
+      - name: Capture overlay checksums
         run: |
-          sha256sum scripts/as04-importfix-0.b64 scripts/as04-importfix-1.b64
-          wc -c scripts/as04-importfix-0.b64 scripts/as04-importfix-1.b64
+          {
+            sha256sum scripts/as04-importfix-0.b64 scripts/as04-importfix-1.b64
+            wc -c scripts/as04-importfix-0.b64 scripts/as04-importfix-1.b64
+          } > import-checksums.txt
+          cat import-checksums.txt
+      - name: Upload checksum report
+        uses: actions/upload-artifact@v7
+        with:
+          name: as04-import-checksums
+          path: import-checksums.txt
+          retention-days: 1
