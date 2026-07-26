@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -56,8 +56,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -72,20 +70,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Format workspace
-        run: pnpm format
-
-      - name: Commit pinned formatting
-        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/as-03-game-profiles'
-        run: |
-          if ! git diff --quiet; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add .
-            git commit -m "Format AS-03 game profile implementation"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
 
       - name: Check formatting
         run: pnpm format:check
