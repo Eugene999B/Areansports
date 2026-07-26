@@ -115,8 +115,7 @@ async function requestData<T>(path: string, options: RequestOptions = {}): Promi
           (response.status >= 500
             ? 'ArenaSports is temporarily unavailable.'
             : 'The request could not be completed.'),
-        errorPayload?.error?.retryable ??
-          (response.status >= 500 || response.status === 429),
+        errorPayload?.error?.retryable ?? (response.status >= 500 || response.status === 429),
         errorPayload?.error?.code ?? 'REQUEST_FAILED',
         response.status,
         errorPayload?.error?.details ?? {},

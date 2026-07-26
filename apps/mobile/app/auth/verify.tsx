@@ -63,8 +63,8 @@ export default function VerifyEmailScreen() {
       <Text style={styles.eyebrow}>CHECK YOUR EMAIL</Text>
       <Text style={styles.title}>Enter your one-time code.</Text>
       <Text style={styles.body}>
-        We sent the code to <Text style={styles.email}>{email}</Text>. The code expires and cannot be
-        used as a permanent password.
+        We sent the code to <Text style={styles.email}>{email}</Text>. The code expires and cannot
+        be used as a permanent password.
       </Text>
 
       {message ? (

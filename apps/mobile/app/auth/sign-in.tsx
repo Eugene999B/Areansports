@@ -83,8 +83,8 @@ export default function SignInScreen() {
       </Pressable>
 
       <Text style={styles.privacy}>
-        The pilot starts with email only. Phone sign-in remains disabled until delivery, abuse, cost,
-        and privacy controls are approved.
+        The pilot starts with email only. Phone sign-in remains disabled until delivery, abuse,
+        cost, and privacy controls are approved.
       </Text>
     </Screen>
   );

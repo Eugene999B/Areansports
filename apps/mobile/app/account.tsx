@@ -112,7 +112,11 @@ export default function AccountScreen() {
 
       <View style={styles.sectionHeader}>
         <Text style={styles.cardTitle}>Signed-in sessions</Text>
-        <Pressable accessibilityRole="button" disabled={loadingSessions} onPress={() => void loadSessions()}>
+        <Pressable
+          accessibilityRole="button"
+          disabled={loadingSessions}
+          onPress={() => void loadSessions()}
+        >
           <Text style={styles.link}>{loadingSessions ? 'Refreshing…' : 'Refresh'}</Text>
         </Pressable>
       </View>
@@ -126,14 +130,20 @@ export default function AccountScreen() {
       {sessions.map((item) => (
         <View key={item.id} style={styles.sessionCard}>
           <View style={styles.sessionHeader}>
-            <Text style={styles.sessionTitle}>{item.current ? 'This device' : 'Another session'}</Text>
+            <Text style={styles.sessionTitle}>
+              {item.current ? 'This device' : 'Another session'}
+            </Text>
             <StatusPill
               label={item.revokedAt ? 'REVOKED' : item.current ? 'CURRENT' : 'ACTIVE'}
               tone={item.revokedAt ? 'warning' : 'success'}
             />
           </View>
-          <Text style={styles.line}>Last seen: {formatSessionTime(item.lastSeenAt, user.timezone)}</Text>
-          <Text style={styles.line}>Expires: {formatSessionTime(item.expiresAt, user.timezone)}</Text>
+          <Text style={styles.line}>
+            Last seen: {formatSessionTime(item.lastSeenAt, user.timezone)}
+          </Text>
+          <Text style={styles.line}>
+            Expires: {formatSessionTime(item.expiresAt, user.timezone)}
+          </Text>
           {!item.current && !item.revokedAt ? (
             <Pressable
               accessibilityRole="button"

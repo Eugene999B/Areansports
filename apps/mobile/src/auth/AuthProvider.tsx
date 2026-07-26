@@ -23,12 +23,7 @@ import {
 import { isAuthenticationConfigured, supabase } from './supabase';
 
 export type AuthStatus =
-  | 'loading'
-  | 'signedOut'
-  | 'needsProfile'
-  | 'authenticated'
-  | 'unavailable'
-  | 'error';
+  'loading' | 'signedOut' | 'needsProfile' | 'authenticated' | 'unavailable' | 'error';
 
 type VerifiedDestination = 'needsProfile' | 'authenticated';
 

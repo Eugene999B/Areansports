@@ -20,7 +20,10 @@ export default function HomeScreen() {
           <Text style={styles.markText}>A</Text>
         </View>
         <Text style={styles.brand}>ArenaSports</Text>
-        <StatusPill label={signedIn ? 'SIGNED IN' : 'FREE PILOT'} tone={signedIn ? 'success' : 'neutral'} />
+        <StatusPill
+          label={signedIn ? 'SIGNED IN' : 'FREE PILOT'}
+          tone={signedIn ? 'success' : 'neutral'}
+        />
       </View>
 
       <View style={styles.hero}>

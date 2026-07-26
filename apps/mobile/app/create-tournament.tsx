@@ -39,8 +39,8 @@ export default function CreateTournamentScreen() {
         <StatusPill label="PROFILE REQUIRED" tone="warning" />
         <Text style={styles.title}>Complete your player profile first.</Text>
         <Text style={styles.body}>
-          Your public handle, country, and timezone are required before roles or tournament ownership
-          can be assigned safely.
+          Your public handle, country, and timezone are required before roles or tournament
+          ownership can be assigned safely.
         </Text>
         <PrimaryButton label="Create profile" onPress={() => router.replace('/auth/profile')} />
       </Screen>
@@ -61,7 +61,8 @@ export default function CreateTournamentScreen() {
           signed-in user from creating competitions or receiving organizer powers automatically.
         </Text>
         <NoticeCard title="Pilot access">
-          Trusted pilot organizers will be reviewed and assigned through audited platform operations.
+          Trusted pilot organizers will be reviewed and assigned through audited platform
+          operations.
         </NoticeCard>
         <PrimaryButton label="Open my account" onPress={() => router.replace('/account')} />
         <PrimaryButton label="Return home" onPress={() => router.replace('/')} />
