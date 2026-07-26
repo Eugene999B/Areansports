@@ -43,6 +43,8 @@ type StoredProfile = {
   ownershipChallenges?: Array<{ id: string }>;
 };
 
+type ProfileLookupStore = Pick<DatabaseClient, 'gameProfile'>;
+
 function mapGame(game: StoredGame): GameCatalogEntry {
   return {
     ...game,
@@ -86,12 +88,15 @@ function isUniqueError(error: unknown): boolean {
   return Boolean(error && typeof error === 'object' && 'code' in error && error.code === 'P2002');
 }
 
+function getUniqueTarget(error: unknown): string {
+  if (!error || typeof error !== 'object' || !('meta' in error)) return '';
+  const meta = error.meta;
+  if (!meta || typeof meta !== 'object' || !('target' in meta)) return '';
+  return String(meta.target);
+}
+
 function mapUniqueError(error: unknown): AppError {
-  const target =
-    error && typeof error === 'object' && 'meta' in error && error.meta && typeof error.meta === 'object' && 'target' in error.meta
-      ? String(error.meta.target)
-      : '';
-  return target.includes('userId')
+  return getUniqueTarget(error).includes('userId')
     ? new AppError(
         'GAME_PROFILE_SLOT_TAKEN',
         'You already have a profile for this game, platform, and region.',
@@ -254,7 +259,11 @@ export class PrismaGameProfileRepository implements GameProfileRepository {
             targetId: profile.id,
             correlationId: security.requestId,
             visibility: 'SECURITY',
-            metadata: { changedFields: Object.keys(input).filter((key) => key !== 'version').sort() },
+            metadata: {
+              changedFields: Object.keys(input)
+                .filter((key) => key !== 'version')
+                .sort(),
+            },
           },
         });
         return mapProfile(profile);
@@ -350,7 +359,7 @@ export class PrismaGameProfileRepository implements GameProfileRepository {
   }
 
   private async assertAvailable(
-    transaction: Parameters<Parameters<DatabaseClient['$transaction']>[0]>[0],
+    transaction: ProfileLookupStore,
     userId: string,
     gameId: string,
     platform: CreateGameProfileInput['platform'],
@@ -360,7 +369,7 @@ export class PrismaGameProfileRepository implements GameProfileRepository {
   ): Promise<void> {
     const conflict = await transaction.gameProfile.findFirst({
       where: {
-        id: excludedId ? { not: excludedId } : undefined,
+        ...(excludedId ? { id: { not: excludedId } } : {}),
         OR: [
           { userId, gameId, platform, region },
           { gameId, platform, region, normalizedUsername },
