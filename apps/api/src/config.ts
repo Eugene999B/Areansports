@@ -27,7 +27,7 @@ export type AppConfig = {
   enableDemoAuth: boolean;
   supabaseUrl?: string;
   supabasePublishableKey?: string;
-  authRequestTimeoutMs: number;
+  authRequestTimeoutMs?: number;
 };
 
 export function readConfig(environment: NodeJS.ProcessEnv = process.env): AppConfig {
