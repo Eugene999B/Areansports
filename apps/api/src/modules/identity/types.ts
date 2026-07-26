@@ -54,11 +54,7 @@ export interface IdentityRepository {
     security: RequestSecurityContext,
   ): Promise<void>;
   listSessions(userId: string, currentProviderSessionId: string): Promise<SessionSummary[]>;
-  revokeSession(
-    userId: string,
-    sessionId: string,
-    security: RequestSecurityContext,
-  ): Promise<void>;
+  revokeSession(userId: string, sessionId: string, security: RequestSecurityContext): Promise<void>;
 }
 
 export function hasAnyRole(user: CurrentUser, allowedRoles: readonly PlatformRole[]): boolean {
