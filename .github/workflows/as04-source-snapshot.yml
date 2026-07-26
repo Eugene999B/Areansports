@@ -56,24 +56,28 @@ jobs:
           ref: agent/as-04-tournament-lifecycle
           fetch-depth: 0
 
-      - name: Capture transfer chunks
-        uses: actions/upload-artifact@v7
-        with:
-          name: as04-transfer-chunks
-          path: scripts/as04-patch-*.b64
-          retention-days: 1
-
       - name: Reconstruct and verify implementation bundle
         run: |
           echo "b99e136a72dbbc29f0055e788650588c2f9d395ebfd0dd2657da0f0eee822bad  scripts/as04-patch-00.b64" | sha256sum --check --strict
-          echo "2a815f4bf4213257ab03d5dd853d16ce522192d6a0800d399726185afdcf73fd  scripts/as04-patch-01.b64" | sha256sum --check --strict
-          echo "3b5b7f873350c871ebb94011d17ecba8ecca552b54340da0e232d60a09e9f49f  scripts/as04-patch-02.b64" | sha256sum --check --strict
-          echo "d992ef589aaab641e999b620d5610a260f74bb68f4ab3d30cdacba8ffe23f754  scripts/as04-patch-03.b64" | sha256sum --check --strict
-          cat scripts/as04-patch-00.b64 scripts/as04-patch-01.b64 scripts/as04-patch-02.b64 scripts/as04-patch-03.b64 > /tmp/as04-changes.tar.gz.b64
+          echo "e8b5d631e9a156c4769d77f33b1255d6d642e7fabde10e756ad63e0debc227e9  scripts/as04-fix-01-0.b64" | sha256sum --check --strict
+          echo "be6594c96e1f4a1451f63e15000e943ab0944ab79b202921733c78c5052ee441  scripts/as04-fix-01-1.b64" | sha256sum --check --strict
+          echo "605463b79d49e98872240c8832002b9c28a6dcf4fc2c6b81b233a9554e6c8277  scripts/as04-fix-01-2.b64" | sha256sum --check --strict
+          echo "a6428dcf92428bdbea0727dc30124257b7f95f802903b63c63d496db3b5bf6d2  scripts/as04-fix-02-0.b64" | sha256sum --check --strict
+          echo "49d5614ecb8dd6aa5a908a7d890d01a4881502a1895f66f601886cc6f3239b93  scripts/as04-fix-02-1.b64" | sha256sum --check --strict
+          echo "470d2c9a458fb5c3d7b65f22c228cc18713dac81ce76506fb160cafff1031a75  scripts/as04-fix-02-2.b64" | sha256sum --check --strict
+          echo "430a4d4273718af3ede8374b30f79205ccb75d971eac2c3a79a07b3d1ab203de  scripts/as04-fix-03-0.b64" | sha256sum --check --strict
+          echo "9972f66b94a1612d77728957c86a2e950cc516d8c14b9c6c08fa4dfda17eb2ef  scripts/as04-fix-03-1.b64" | sha256sum --check --strict
+          echo "c2f3e268d98964536b6c522ae38634b984b0e1cc3b1392b736afd8984350e23c  scripts/as04-fix-03-2.b64" | sha256sum --check --strict
+          cat \
+            scripts/as04-patch-00.b64 \
+            scripts/as04-fix-01-0.b64 scripts/as04-fix-01-1.b64 scripts/as04-fix-01-2.b64 \
+            scripts/as04-fix-02-0.b64 scripts/as04-fix-02-1.b64 scripts/as04-fix-02-2.b64 \
+            scripts/as04-fix-03-0.b64 scripts/as04-fix-03-1.b64 scripts/as04-fix-03-2.b64 \
+            > /tmp/as04-changes.tar.gz.b64
           base64 --decode /tmp/as04-changes.tar.gz.b64 > /tmp/as04-changes.tar.gz
           echo "cf1758a4217d41cb8f850fe262a8339c244398d5930687c246df78da77c297e0  /tmp/as04-changes.tar.gz" | sha256sum --check --strict
           tar -xzf /tmp/as04-changes.tar.gz
-          rm scripts/as04-patch-00.b64 scripts/as04-patch-01.b64 scripts/as04-patch-02.b64 scripts/as04-patch-03.b64
+          rm -f scripts/as04-patch-*.b64 scripts/as04-fix-*.b64
           rm .github/workflows/as04-source-snapshot.yml
 
       - name: Install pnpm
