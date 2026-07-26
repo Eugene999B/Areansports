@@ -6,10 +6,7 @@ import { InMemoryIdentityRepository } from './modules/identity/repository.js';
 import { identityRoutes } from './modules/identity/routes.js';
 import { IdentityService } from './modules/identity/service.js';
 import { PrismaIdentityRepository } from './modules/identity/prisma-repository.js';
-import {
-  DisabledIdentityVerifier,
-  SupabaseIdentityVerifier,
-} from './modules/identity/verifier.js';
+import { DisabledIdentityVerifier, SupabaseIdentityVerifier } from './modules/identity/verifier.js';
 import { InMemoryTournamentRepository } from './modules/tournaments/repository.js';
 import { tournamentRoutes } from './modules/tournaments/routes.js';
 import { TournamentService } from './modules/tournaments/service.js';
