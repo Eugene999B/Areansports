@@ -1,32 +1,31 @@
 import { CreateTournamentSchema } from '@arenasports/contracts';
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginAsync, FastifyRequest } from 'fastify';
 import { AppError } from '../../errors.js';
+import { extractBearerToken } from '../identity/routes.js';
+import type { IdentityService } from '../identity/service.js';
 import type { TournamentService } from './service.js';
 
 type TournamentRoutesOptions = {
   service: TournamentService;
+  identityService: IdentityService;
   enableDemoAuth: boolean;
 };
 
-function resolveActorId(header: string | string[] | undefined, enableDemoAuth: boolean): string {
-  if (!enableDemoAuth) {
-    throw new AppError(
-      'AUTHENTICATION_REQUIRED',
-      'Authentication is not configured for this environment.',
-      401,
-    );
+async function resolveActorId(
+  request: FastifyRequest,
+  options: TournamentRoutesOptions,
+): Promise<string> {
+  if (options.enableDemoAuth) {
+    const header = request.headers['x-demo-user-id'];
+    const demoActorId = Array.isArray(header) ? header[0] : header;
+    if (demoActorId) return demoActorId;
   }
 
-  const actorId = Array.isArray(header) ? header[0] : header;
-  if (!actorId) {
-    throw new AppError(
-      'AUTHENTICATION_REQUIRED',
-      'Provide x-demo-user-id only in a development or test environment.',
-      401,
-    );
-  }
-
-  return actorId;
+  const actor = await options.identityService.authenticate(extractBearerToken(request), {
+    requestId: request.id,
+  });
+  options.identityService.requireAnyRole(actor, ['ORGANIZER']);
+  return actor.user.id;
 }
 
 export const tournamentRoutes: FastifyPluginAsync<TournamentRoutesOptions> = async (
@@ -43,7 +42,7 @@ export const tournamentRoutes: FastifyPluginAsync<TournamentRoutesOptions> = asy
   });
 
   app.post('/', async (request, reply) => {
-    const actorId = resolveActorId(request.headers['x-demo-user-id'], options.enableDemoAuth);
+    const actorId = await resolveActorId(request, options);
     const result = CreateTournamentSchema.safeParse(request.body);
 
     if (!result.success) {
