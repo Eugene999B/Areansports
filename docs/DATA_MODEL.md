@@ -1,30 +1,88 @@
 # ArenaSports data model
 
-The Prisma schema is the executable source of truth. This document explains intent and lifecycle so names are not mistaken for policy.
+The Prisma schema is the executable source of truth. This document explains intent and lifecycle so names are not mistaken for policy. Models described as planned may not yet exist in the executable schema.
 
 ## Identity
 
-### User
+### User — implemented
 
-ArenaSports account state: public handle, display name, country, timezone, status, timestamps. Authentication secrets remain with the chosen provider.
+ArenaSports-owned account state:
 
-### GameProfile
+- stable internal ID independent of the authentication provider;
+- public handle plus unique normalized handle;
+- display name, country, timezone, optional avatar, and profile visibility;
+- notification preferences;
+- `ACTIVE`, `SUSPENDED`, or `DELETED` status;
+- created and updated timestamps.
 
-A public identity used inside a supported game: user, game, platform, region, username, normalized lookup value, verification state, and visibility. Verification state describes ArenaSports evidence/adapter confidence; it must not imply publisher certification without an authorized adapter.
+The `User` ID is the durable reference used by tournaments, registrations, evidence, disputes, and audit records. Provider subjects are never used as ArenaSports primary user IDs.
 
-### RoleAssignment
+### ExternalIdentity — implemented
 
-Scoped role such as platform admin, platform moderator, tournament organizer, tournament moderator, or participant manager. Scope and expiry are explicit.
+Maps one remotely verified authentication identity to an ArenaSports user:
 
-### Block / Report / Sanction
+- provider (`SUPABASE` for the pilot);
+- provider subject;
+- normalized verified email or phone metadata;
+- verification timestamps;
+- created and updated timestamps.
 
-Safety relationships and cases. Sanctions include policy basis, start/end, issuer, appeal state, and audit reference.
+`(provider, providerSubject)` is unique. Normalized verified email and phone values are unique when present. The table never stores passwords, OTP codes, access tokens, refresh tokens, or provider secret keys.
+
+The separate mapping preserves a provider-exit path: a future verified provider identity may be attached to the same ArenaSports user without losing competition history.
+
+### UserSession — implemented
+
+ArenaSports-observed provider session metadata:
+
+- internal session ID;
+- user;
+- unique provider session identifier;
+- created, last-seen, and provider expiry times;
+- optional revocation time and reason;
+- optional privacy-reviewed hashes for user-agent or IP context.
+
+The provider session identifier is a deny-list and support reference, not an access token. Locally revoked sessions remain denied even when a previously issued provider token has not yet expired. Raw token material is never persisted.
+
+### RoleAssignment — implemented for platform roles
+
+An assignment contains:
+
+- user;
+- role: `PLAYER`, `ORGANIZER`, `MODERATOR`, or `ADMINISTRATOR`;
+- scope type and scope ID;
+- optional expiry;
+- creation time.
+
+The default new-account assignment is `PLAYER` at platform scope. Provider claims never create privileged roles. The current schema supports explicit scope fields; resource-specific tournament staff policy and management endpoints remain future work.
+
+### GameProfile — schema scaffold; AS-03 behaviour planned
+
+A public identity used inside a supported game: user, game, platform, region, username, normalized lookup value, verification state, and visibility. Verification state describes ArenaSports evidence/community confidence; it must not imply publisher certification without an authorized adapter.
+
+Game profiles never contain game passwords or private game-account credentials.
+
+### Block / Report / Sanction — planned
+
+Safety relationships and cases. Sanctions will include policy basis, start/end, issuer, appeal state, and audit reference.
+
+## Identity transactions
+
+Account bootstrap commits the following together:
+
+1. `User`;
+2. `ExternalIdentity`;
+3. default `PLAYER` `RoleAssignment`;
+4. first `UserSession`;
+5. `IDENTITY.ACCOUNT_CREATED` `AuditEvent`.
+
+Profile updates and session revocations commit their state change and audit event in the same transaction. Unique constraints protect concurrent duplicate handles, provider subjects, verified contacts, role assignments, and provider sessions.
 
 ## Games and rules
 
-### Game / GamePlatform / GameRegion
+### Game
 
-Catalog records that avoid hard-coding one publisher or country.
+Catalog record that avoids hard-coding one publisher or country. The current schema stores slug, name, optional publisher, active state, and result-provider capability label.
 
 ### RulesetVersion
 
@@ -36,29 +94,31 @@ Immutable published JSON plus normalized fields used by the engine: format, scor
 
 Mutable lifecycle shell: owner, game/platform, title, slug, visibility, status, timezone, capacity, dates, active ruleset version, and optimistic version.
 
-### TournamentStaff
+The schema exists, but the current API tournament repository remains in memory. PostgreSQL-backed tournament lifecycle is AS-04.
+
+### TournamentStaff — planned
 
 Organizer/moderator assignments scoped to one tournament, with permissions and conflict metadata.
 
-### TournamentInvitation
+### TournamentInvitation — planned
 
 Token digest, target, status, expiry, and issuer. Raw invitation tokens are never stored after issuance.
 
 ### TournamentRegistration
 
-User, game profile, status, seed input, eligibility snapshot, rules acknowledgement, timestamps, and version. A unique constraint prevents duplicate active registration.
+User, game profile, status, eligibility snapshot, exact rules acknowledgement, timestamps, and version. A unique constraint prevents duplicate user registration in a tournament.
 
 ### TournamentParticipant
 
 Locked competition slot created from an accepted registration. Participant snapshots protect historical display from later profile edits.
 
-### TournamentSnapshot
+### TournamentSnapshot — planned
 
 Input and algorithm metadata captured before fixture generation: participant order, seed values, rules digest, generator version, random seed when applicable, and output digest.
 
 ## Competition
 
-### Stage / Group / Round
+### Stage / Group / Round — planned
 
 Hierarchical competition structure. Format-specific metadata is versioned and validated.
 
@@ -66,11 +126,11 @@ Hierarchical competition structure. Format-specific metadata is versioned and va
 
 Participants/slots, round, sequence, window, status, match reference, active resolution, ruleset reference, and optimistic version.
 
-### Standing
+### Standing — planned
 
 Materialized projection for efficient display. It is written only by the scoring engine from finalized resolutions and can be rebuilt.
 
-### StandingEvent
+### StandingEvent — planned
 
 Append-only scoring delta tied to a resolution, allowing rebuild and correction reversal without unexplained direct edits.
 
@@ -78,23 +138,23 @@ Append-only scoring delta tied to a resolution, allowing rebuild and correction 
 
 ### MatchCheckIn
 
-Fixture, participant, server time, device/session reference, idempotency key, and state. Device location is not required by default.
+Fixture, participant, server time, fixture version, and idempotency key. Device location is not required by default.
 
-### AvailabilityProposal
+### AvailabilityProposal — planned
 
 Proposer, candidate time/range, status, expiry, response actor, and timestamps.
 
-### MatchRoomEvent
+### MatchRoomEvent — planned
 
 Structured presence/coordination events such as joined, ready, time accepted, reference viewed, or connectivity problem reported. It is supporting context, not infallible proof.
 
 ### MatchSubmission
 
-Submitter, claimed score/outcome, played-at time, notes, client request time, server time, status, idempotency key, and integrity metadata. Submissions are immutable; corrections create replacements.
+Submitter, claimed score, played-at time, notes, status, idempotency key, request digest, and server timestamp. Submissions are immutable; corrections create replacements.
 
 ### MatchResolution
 
-Versioned outcome: type, score, winner/draw/void, policy reason, decision source, actor, finalized time, rules/algorithm versions, and superseded resolution where applicable.
+Versioned outcome: source, score, winner/draw/void, policy reason, decision actor, finalized time, rules/algorithm versions, and superseded resolution where applicable.
 
 Resolution sources include mutual confirmation, compatible submissions, moderator decision, rules-based forfeit, authorized provider, correction, and void.
 
@@ -102,35 +162,35 @@ Resolution sources include mutual confirmation, compatible submissions, moderato
 
 ### Evidence
 
-Private object reference, owner, fixture/submission/case association, media type, size, digest, scan state, capture claim, upload/retention timestamps, and deletion state. Never store a permanent public URL.
+Private object reference, owner, fixture/submission association, media type, size, digest, scan state, capture claim, upload/retention timestamps, and deletion state. Never store a permanent public URL.
 
 ### Dispute
 
-Fixture, opener, category, statement, status, priority, assigned reviewer, conflict check, due times, and current decision.
+Fixture, opener, category, statement, status, priority, assigned reviewer, version, decision, and timestamps.
 
-### DisputeEvent
+### DisputeEvent — planned
 
 Append-only statements, status changes, evidence links, assignments, and protected internal notes with visibility classification.
 
-### ModerationDecision
+### ModerationDecision — planned as a distinct record
 
 Reason code, explanation, structured outcome, actor, decision time, policy version, and appealability.
 
-### Appeal
+### Appeal — planned
 
 Separate review record linked to the original decision. It never overwrites history.
 
-### IntegritySignal
+### IntegritySignal — planned
 
-Explainable input such as repeated conflicts, impossible timestamps, duplicate media digest, abnormal account linkage, or authorized provider mismatch. Signal is not guilt and cannot directly punish without policy.
+Explainable input such as repeated conflicts, impossible timestamps, duplicate media digest, abnormal account linkage, or authorized provider mismatch. A signal is not guilt and cannot directly punish without policy.
 
 ## Notifications and async work
 
-### Notification
+### Notification — planned
 
 Durable in-app item with user, category, title/body key and parameters, destination, read time, and dedupe key.
 
-### DeliveryAttempt
+### DeliveryAttempt — planned
 
 Channel, provider, attempt, status, safe error code, and timestamps.
 
@@ -150,13 +210,39 @@ Append-only record:
 - target type and target ID;
 - correlation/request ID;
 - tournament/fixture scope;
-- safe before/after or structured metadata;
-- visibility classification;
-- originating IP/device references where policy permits.
+- safe structured metadata;
+- visibility classification.
 
-Audit events must not contain raw tokens, private evidence URLs, or unnecessary personal data.
+AS-02 emits:
+
+- `IDENTITY.ACCOUNT_CREATED`;
+- `IDENTITY.PROFILE_UPDATED`;
+- `IDENTITY.SESSION_CREATED`;
+- `IDENTITY.SESSION_REVOKED`.
+
+Audit events must not contain raw tokens, OTP codes, private evidence URLs, passwords, or unnecessary personal data. Debug logs are not audit logs.
 
 ## State transitions
+
+### User
+
+```text
+ACTIVE -> SUSPENDED
+ACTIVE -> DELETED
+SUSPENDED -> ACTIVE       (future authorized review path)
+SUSPENDED -> DELETED
+```
+
+Suspended and deleted users cannot establish an ArenaSports-authenticated request context. Deletion/anonymization policy still requires legal and product approval before production.
+
+### UserSession
+
+```text
+ACTIVE -> EXPIRED
+ACTIVE -> REVOKED
+```
+
+Expiry comes from the provider token/session boundary. Revocation is ArenaSports-local denial and must be combined with provider sign-out/revocation where applicable.
 
 ### Tournament
 
@@ -189,12 +275,16 @@ Alternate outcomes: `RESCHEDULED`, `FORFEIT_PENDING`, `VOID`, and versioned corr
 ## Critical constraints
 
 - Unique normalized public handle.
+- Unique provider subject per authentication provider.
+- Unique normalized verified email/phone when present.
+- Unique provider session identifier.
+- Unique role assignment per user/role/scope.
 - Unique active game profile identity per game/platform/region where policy requires.
-- Unique active registration per user/tournament.
+- Unique registration per user/tournament.
 - Unique participant slot per tournament.
 - Unique match reference.
 - Unique idempotency key within actor/action scope.
-- Unique standing event per resolution/participant.
+- Unique standing event per resolution/participant when standings are implemented.
 - Only one active resolution pointer per fixture.
 - Foreign keys and lifecycle-relevant timestamps indexed.
 - Case assignment queries and tournament fixture queries indexed.
@@ -204,6 +294,8 @@ Alternate outcomes: `RESCHEDULED`, `FORFEIT_PENDING`, `VOID`, and versioned corr
 
 Exact durations require legal/product approval.
 
+- External identity/contact metadata: account lifetime plus limited recovery and integrity window.
+- Session metadata: short security/support period appropriate to session and incident investigation needs.
 - Account/profile: account lifetime plus limited recovery window.
 - Public competition record: long-lived for transparency, subject to lawful deletion/anonymization.
 - Raw evidence: shortest practical configurable period after final appeal.
@@ -214,4 +306,6 @@ Exact durations require legal/product approval.
 
 ## Migration discipline
 
-Every migration needs expected lock/rewrite behavior, deployment order, compatibility window, recovery plan, and data backfill observability. Destructive migrations use expand/migrate/contract rather than one-step deletion.
+The committed `20260726090000_initial_foundation` PostgreSQL migration is the baseline for the current schema. CI applies migrations from zero against disposable PostgreSQL before database-backed tests.
+
+Every future migration needs expected lock/rewrite behaviour, deployment order, compatibility window, recovery plan, and data-backfill observability. Destructive migrations use expand/migrate/contract rather than one-step deletion.
