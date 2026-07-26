@@ -71,8 +71,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Format workspace for artifact
+        run: pnpm format
+
+      - name: Collect formatted files
+        run: |
+          mkdir -p /tmp/arenasports-formatted
+          git diff --name-only -z | while IFS= read -r -d '' path; do
+            mkdir -p "/tmp/arenasports-formatted/$(dirname "$path")"
+            cp "$path" "/tmp/arenasports-formatted/$path"
+          done
+
+      - name: Upload formatted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: arenasports-formatted-files
+          path: /tmp/arenasports-formatted
+          if-no-files-found: error
+          retention-days: 3
+
       - name: Check formatting
-        run: pnpm format:check
+        run: git diff --exit-code
 
       - name: Validate Prisma schema
         run: pnpm --filter @arenasports/database db:validate
