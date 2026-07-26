@@ -1,4 +1,4 @@
-name: Apply AS-04 implementation
+name: Inspect AS-04 import overlay
 
 on:
   pull_request:
@@ -6,148 +6,18 @@ on:
       - agent/as-03-game-profiles
 
 permissions:
-  contents: write
-
-concurrency:
-  group: apply-as04-${{ github.head_ref }}
-  cancel-in-progress: true
+  contents: read
 
 jobs:
-  apply-and-validate:
+  inspect:
     if: github.head_ref == 'agent/as-04-tournament-lifecycle'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    services:
-      postgres:
-        image: postgres:18-alpine
-        env:
-          POSTGRES_DB: arenasports
-          POSTGRES_USER: arenasports
-          POSTGRES_PASSWORD: arenasports
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U arenasports -d arenasports"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:8-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://arenasports:arenasports@localhost:5432/arenasports?schema=public
-      REDIS_URL: redis://localhost:6379
-      LOG_LEVEL: silent
-      ENABLE_DEMO_AUTH: 'false'
-
+    timeout-minutes: 5
     steps:
-      - name: Check out branch
-        uses: actions/checkout@v7
+      - uses: actions/checkout@v7
         with:
           ref: agent/as-04-tournament-lifecycle
-          fetch-depth: 0
-
-      - name: Reconstruct verified implementation and corrections
+      - name: Print overlay checksums
         run: |
-          echo "b99e136a72dbbc29f0055e788650588c2f9d395ebfd0dd2657da0f0eee822bad  scripts/as04-patch-00.b64" | sha256sum --check --strict
-          echo "e8b5d631e9a156c4769d77f33b1255d6d642e7fabde10e756ad63e0debc227e9  scripts/as04-fix-01-0.b64" | sha256sum --check --strict
-          echo "be6594c96e1f4a1451f63e15000e943ab0944ab79b202921733c78c5052ee441  scripts/as04-fix-01-1.b64" | sha256sum --check --strict
-          echo "605463b79d49e98872240c8832002b9c28a6dcf4fc2c6b81b233a9554e6c8277  scripts/as04-fix-01-2.b64" | sha256sum --check --strict
-          echo "a6428dcf92428bdbea0727dc30124257b7f95f802903b63c63d496db3b5bf6d2  scripts/as04-fix-02-0.b64" | sha256sum --check --strict
-          echo "49d5614ecb8dd6aa5a908a7d890d01a4881502a1895f66f601886cc6f3239b93  scripts/as04-fix-02-1.b64" | sha256sum --check --strict
-          echo "470d2c9a458fb5c3d7b65f22c228cc18713dac81ce76506fb160cafff1031a75  scripts/as04-fix-02-2.b64" | sha256sum --check --strict
-          echo "430a4d4273718af3ede8374b30f79205ccb75d971eac2c3a79a07b3d1ab203de  scripts/as04-fix-03-0.b64" | sha256sum --check --strict
-          echo "9972f66b94a1612d77728957c86a2e950cc516d8c14b9c6c08fa4dfda17eb2ef  scripts/as04-fix-03-1.b64" | sha256sum --check --strict
-          echo "c2f3e268d98964536b6c522ae38634b984b0e1cc3b1392b736afd8984350e23c  scripts/as04-fix-03-2.b64" | sha256sum --check --strict
-          cat \
-            scripts/as04-patch-00.b64 \
-            scripts/as04-fix-01-0.b64 scripts/as04-fix-01-1.b64 scripts/as04-fix-01-2.b64 \
-            scripts/as04-fix-02-0.b64 scripts/as04-fix-02-1.b64 scripts/as04-fix-02-2.b64 \
-            scripts/as04-fix-03-0.b64 scripts/as04-fix-03-1.b64 scripts/as04-fix-03-2.b64 \
-            > /tmp/as04-changes.tar.gz.b64
-          base64 --decode /tmp/as04-changes.tar.gz.b64 > /tmp/as04-changes.tar.gz
-          echo "cf1758a4217d41cb8f850fe262a8339c244398d5930687c246df78da77c297e0  /tmp/as04-changes.tar.gz" | sha256sum --check --strict
-          tar -xzf /tmp/as04-changes.tar.gz
-
-          echo "0f2168ffdfdafcb0037959bf34a04de8edfbc34eea1b3ad91f98c499e486dc8d  scripts/as04-typefix-0.b64" | sha256sum --check --strict
-          echo "94a879139d6c8dcfc2894de09783732a3d01cfc63d7cfb42b577140a6de83371  scripts/as04-typefix-1.b64" | sha256sum --check --strict
-          cat scripts/as04-typefix-0.b64 scripts/as04-typefix-1.b64 > /tmp/as04-typefix.tar.gz.b64
-          base64 --decode /tmp/as04-typefix.tar.gz.b64 > /tmp/as04-typefix.tar.gz
-          echo "d74bb1db8d40c2edc0cad9d7ae17e376a28e1d25c147e2e86335db197d053a50  /tmp/as04-typefix.tar.gz" | sha256sum --check --strict
-          tar -xzf /tmp/as04-typefix.tar.gz
-
-          echo "e546aac34c214abb8e19c2e09cf12feeccd3c98338cf05f7a64899854845cc42  scripts/as04-importfix-0.b64" | sha256sum --check --strict
-          echo "ccb72b532164455911a212d8cb6d945c2eb311bc2c626dbf822805da442b6768  scripts/as04-importfix-1.b64" | sha256sum --check --strict
-          cat scripts/as04-importfix-0.b64 scripts/as04-importfix-1.b64 > /tmp/as04-importfix.tar.gz.b64
-          base64 --decode /tmp/as04-importfix.tar.gz.b64 > /tmp/as04-importfix.tar.gz
-          echo "b888a6d9861ffcf1cbc6b20b1aca7fcc5c330818fc70eeae27c185b220895266  /tmp/as04-importfix.tar.gz" | sha256sum --check --strict
-          tar -xzf /tmp/as04-importfix.tar.gz
-
-          rm -f scripts/as04-patch-*.b64 scripts/as04-fix-*.b64 scripts/as04-typefix-*.b64 scripts/as04-importfix-*.b64
-          rm .github/workflows/as04-source-snapshot.yml
-
-      - name: Install pnpm
-        uses: pnpm/action-setup@v6
-        with:
-          version: 11.17.0
-
-      - name: Install Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 22.13.0
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Apply pinned formatting
-        run: pnpm format
-
-      - name: Check formatting
-        run: pnpm format:check
-
-      - name: Validate Prisma schema
-        run: pnpm --filter @arenasports/database db:validate
-
-      - name: Deploy database migrations from zero
-        run: pnpm --filter @arenasports/database db:deploy
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
-
-      - name: Smoke test compiled API
-        run: |
-          pnpm --filter @arenasports/api start > /tmp/arenasports-api.log 2>&1 &
-          api_pid=$!
-          trap 'kill "$api_pid" 2>/dev/null || true' EXIT
-          for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:4000/health/live > /dev/null; then
-              exit 0
-            fi
-            sleep 1
-          done
-          cat /tmp/arenasports-api.log
-          exit 1
-
-      - name: Commit validated implementation
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Implement AS-04 tournament lifecycle"
-          git push origin HEAD:agent/as-04-tournament-lifecycle
+          sha256sum scripts/as04-importfix-0.b64 scripts/as04-importfix-1.b64
+          wc -c scripts/as04-importfix-0.b64 scripts/as04-importfix-1.b64
