@@ -14,17 +14,17 @@ ArenaSports tests protect competition truth, player safety, and recoverability. 
 
 ## Test layers
 
-| Layer                   | Purpose                                                             | Required examples                                                          |
-| ----------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Schema/contract         | Reject malformed or incompatible inputs                             | Zod request/response fixtures, errors, handle normalization                 |
-| Domain unit             | Prove pure competition and authorization rules                      | transitions, scoring, role matrix, no-show policy                          |
-| Repository integration  | Prove database constraints and transactions                         | identity bootstrap, capacity races, version conflicts, audit atomicity     |
-| API integration         | Prove authentication, authorization, idempotency, and HTTP behavior | account status, session revoke, role matrix, duplicate keys, safe errors   |
-| Provider-boundary unit  | Prove external authentication mapping and failure handling          | expiry, subject mismatch, unavailable provider, verified contact           |
-| Mobile component/flow   | Prove visible states and accessible actions                         | signed out, onboarding, offline, error, retry, disabled, screen reader     |
-| End-to-end              | Prove complete user outcomes                                        | sign in/profile/session; create/publish/join/fixture/submit/finalize       |
-| Operational             | Prove deployment and recovery                                       | migrations, backup restore, secret/config validation, rollback drill       |
-| Security/adversarial    | Prove abuse resistance                                              | IDOR, privilege escalation, replay, forged ownership, rate limits          |
+| Layer                  | Purpose                                                             | Required examples                                                        |
+| ---------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Schema/contract        | Reject malformed or incompatible inputs                             | Zod request/response fixtures, errors, handle normalization              |
+| Domain unit            | Prove pure competition and authorization rules                      | transitions, scoring, role matrix, no-show policy                        |
+| Repository integration | Prove database constraints and transactions                         | identity bootstrap, capacity races, version conflicts, audit atomicity   |
+| API integration        | Prove authentication, authorization, idempotency, and HTTP behavior | account status, session revoke, role matrix, duplicate keys, safe errors |
+| Provider-boundary unit | Prove external authentication mapping and failure handling          | expiry, subject mismatch, unavailable provider, verified contact         |
+| Mobile component/flow  | Prove visible states and accessible actions                         | signed out, onboarding, offline, error, retry, disabled, screen reader   |
+| End-to-end             | Prove complete user outcomes                                        | sign in/profile/session; create/publish/join/fixture/submit/finalize     |
+| Operational            | Prove deployment and recovery                                       | migrations, backup restore, secret/config validation, rollback drill     |
+| Security/adversarial   | Prove abuse resistance                                              | IDOR, privilege escalation, replay, forged ownership, rate limits        |
 
 The test pyramid should be broad at pure-domain/provider-boundary layers, focused at database/API integration, and small but high-value at end-to-end.
 
