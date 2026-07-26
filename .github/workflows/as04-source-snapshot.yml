@@ -1,4 +1,4 @@
-name: Apply AS-04 implementation
+name: Diagnose AS-04 typecheck
 
 on:
   pull_request:
@@ -6,57 +6,24 @@ on:
       - agent/as-03-game-profiles
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
-  group: apply-as04-${{ github.head_ref }}
+  group: diagnose-as04-${{ github.head_ref }}
   cancel-in-progress: true
 
 jobs:
-  apply-and-validate:
+  diagnose:
     if: github.head_ref == 'agent/as-04-tournament-lifecycle'
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-
-    services:
-      postgres:
-        image: postgres:18-alpine
-        env:
-          POSTGRES_DB: arenasports
-          POSTGRES_USER: arenasports
-          POSTGRES_PASSWORD: arenasports
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U arenasports -d arenasports"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-      redis:
-        image: redis:8-alpine
-        ports:
-          - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 10
-
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://arenasports:arenasports@localhost:5432/arenasports?schema=public
-      REDIS_URL: redis://localhost:6379
-      LOG_LEVEL: silent
-      ENABLE_DEMO_AUTH: 'false'
-
+    timeout-minutes: 20
     steps:
       - name: Check out branch
         uses: actions/checkout@v7
         with:
           ref: agent/as-04-tournament-lifecycle
-          fetch-depth: 0
 
-      - name: Reconstruct and verify implementation bundle
+      - name: Reconstruct verified implementation source
         run: |
           echo "b99e136a72dbbc29f0055e788650588c2f9d395ebfd0dd2657da0f0eee822bad  scripts/as04-patch-00.b64" | sha256sum --check --strict
           echo "e8b5d631e9a156c4769d77f33b1255d6d642e7fabde10e756ad63e0debc227e9  scripts/as04-fix-01-0.b64" | sha256sum --check --strict
@@ -77,8 +44,6 @@ jobs:
           base64 --decode /tmp/as04-changes.tar.gz.b64 > /tmp/as04-changes.tar.gz
           echo "cf1758a4217d41cb8f850fe262a8339c244398d5930687c246df78da77c297e0  /tmp/as04-changes.tar.gz" | sha256sum --check --strict
           tar -xzf /tmp/as04-changes.tar.gz
-          rm -f scripts/as04-patch-*.b64 scripts/as04-fix-*.b64
-          rm .github/workflows/as04-source-snapshot.yml
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -94,45 +59,27 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Apply pinned formatting
-        run: pnpm format
+      - name: Generate Prisma client
+        run: pnpm --filter @arenasports/database db:generate
 
-      - name: Check formatting
-        run: pnpm format:check
-
-      - name: Validate Prisma schema
-        run: pnpm --filter @arenasports/database db:validate
-
-      - name: Deploy database migrations from zero
-        run: pnpm --filter @arenasports/database db:deploy
-
-      - name: Typecheck
-        run: pnpm typecheck
-
-      - name: Test
-        run: pnpm test
-
-      - name: Build
-        run: pnpm build
-
-      - name: Smoke test compiled API
+      - name: Run strict typecheck
+        id: typecheck
+        continue-on-error: true
         run: |
-          pnpm --filter @arenasports/api start > /tmp/arenasports-api.log 2>&1 &
-          api_pid=$!
-          trap 'kill "$api_pid" 2>/dev/null || true' EXIT
-          for attempt in {1..20}; do
-            if curl --fail --silent http://127.0.0.1:4000/health/live > /dev/null; then
-              exit 0
-            fi
-            sleep 1
-          done
-          cat /tmp/arenasports-api.log
-          exit 1
+          set +e
+          pnpm typecheck > typecheck.log 2>&1
+          status=$?
+          cat typecheck.log
+          exit $status
 
-      - name: Commit validated implementation
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          git commit -m "Implement AS-04 tournament lifecycle"
-          git push origin HEAD:agent/as-04-tournament-lifecycle
+      - name: Upload complete compiler diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: as04-typecheck-diagnostics
+          path: typecheck.log
+          retention-days: 1
+
+      - name: Fail when typecheck failed
+        if: steps.typecheck.outcome == 'failure'
+        run: exit 1
