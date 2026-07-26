@@ -41,10 +41,19 @@ export default function HomeScreen() {
         onPress={() => router.push('/tournaments')}
       />
 
+      <Link href="/game-profiles/find" style={styles.secondaryLink}>
+        Find a player's public game identity
+      </Link>
+
       {signedIn ? (
-        <Link href="/account" style={styles.secondaryLink}>
-          Open @{user.handle}'s account
-        </Link>
+        <>
+          <Link href="/game-profiles" style={styles.secondaryLink}>
+            Manage your eFootball or FC Mobile identity
+          </Link>
+          <Link href="/account" style={styles.secondaryLink}>
+            Open @{user.handle}'s account
+          </Link>
+        </>
       ) : (
         <Link href="/auth/sign-in" style={styles.secondaryLink}>
           Sign in or create an account
