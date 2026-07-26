@@ -55,8 +55,10 @@ export function readConfig(environment: NodeJS.ProcessEnv = process.env): AppCon
       .map((origin) => origin.trim())
       .filter(Boolean),
     enableDemoAuth: parsed.ENABLE_DEMO_AUTH,
-    supabaseUrl: parsed.SUPABASE_URL,
-    supabasePublishableKey: parsed.SUPABASE_PUBLISHABLE_KEY,
     authRequestTimeoutMs: parsed.AUTH_REQUEST_TIMEOUT_MS,
+    ...(parsed.SUPABASE_URL ? { supabaseUrl: parsed.SUPABASE_URL } : {}),
+    ...(parsed.SUPABASE_PUBLISHABLE_KEY
+      ? { supabasePublishableKey: parsed.SUPABASE_PUBLISHABLE_KEY }
+      : {}),
   };
 }
