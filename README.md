@@ -6,56 +6,63 @@ ArenaSports is a mobile-first community competition platform for organizing fair
 
 ## Product status
 
-**Pre-MVP — identity and session foundation implemented.** The repository now contains a cleanly validated product/engineering foundation plus the first end-to-end account slice. It is not yet a production release.
+**Pre-MVP — account/session and game-profile foundations implemented.** The repository contains a cleanly validated product/engineering foundation plus two end-to-end player identity slices. It is not yet a production release.
 
 The first release is intentionally free. It does **not** include entry fees, betting, wagering, prize custody, wallets, or cash settlement. Donations and clearly defined premium convenience features may be considered later only after the free competition experience, safety controls, legal review, and operating model are proven.
 
 ## Current implementation and continuation
 
 **Checkpoint date:** 2026-07-26  
-**Active branch:** `agent/as-02-identity-sessions`  
-**Draft pull request:** [#4 — Implement AS-02 identity and session foundation](https://github.com/Eugene999B/Areansports/pull/4)
+**Active branch:** `agent/as-03-game-profiles`  
+**Stacked draft pull requests:** [#4 — AS-02 identity and sessions](https://github.com/Eugene999B/Areansports/pull/4) and [#5 — AS-03 game profiles](https://github.com/Eugene999B/Areansports/pull/5)
 
 The terms **planned**, **scaffolded**, **implemented**, and **verified** are used deliberately:
 
-- **Product and operations — validated documentation:** product requirements, architecture, API conventions, data model, match verification, security, moderation operations, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog.
+- **Product and operations — validated documentation:** product requirements, architecture, API conventions, data model, match verification, security, moderation operations, game-profile truth policy, test strategy, Ghana pilot plan, roadmap, and ordered execution backlog.
 - **Workspace — validated:** pnpm 11 monorepo, Node.js 22 requirement, frozen lockfile, TypeScript strict mode, Prettier, Docker services, scoped contributor instructions, and GitHub Actions.
 - **Identity contracts — implemented and tested:** profile, account status, platform roles, notification preferences, session summaries, safe normalized handles, and stable error codes.
 - **Authentication provider boundary — implemented and tested:** Supabase Auth selected by ADR; verified email OTP first; bearer tokens remotely validated; provider subject mapped to ArenaSports user; phone authentication deferred.
 - **Identity persistence — implemented and database-tested:** users, external identities, observed sessions, role assignments, and security audit events in PostgreSQL through Prisma transactions.
 - **Identity API — implemented and tested:** account bootstrap, current profile, profile update, session list/revocation, status enforcement, and role-aware tournament creation.
 - **Mobile account flow — implemented and clean-build validated:** email code request/verification, secure native session storage, profile onboarding, restored sessions, explicit error states, account/session screen, session revocation, and sign-out.
-- **Database migration — implemented and clean-CI validated:** committed PostgreSQL baseline applied from zero before database-backed tests.
+- **Game-profile contracts — implemented and tested:** eFootball/FC Mobile catalogue, mobile platforms, region, public username, Unicode-safe normalization, truth labels, visibility, versioned edits, and ownership challenges.
+- **Game-profile persistence and API — implemented and database-tested:** PostgreSQL migration, uniqueness/concurrency constraints, authenticated own-profile CRUD subset, privacy-preserving public lookup, private challenge creation, and audit events.
+- **Mobile game-profile flow — implemented and clean-build validated:** link/edit/hide a public game identity, public handle lookup, accurate truth labels, and sign-in-gated ownership review requests.
+- **Database migrations — implemented and clean-CI validated:** the baseline and AS-03 migration apply from zero before database-backed tests.
 - **Tournament API — foundation only:** public discovery and guarded draft creation exist, but the repository is still in memory and publication/registration/fixtures are not implemented.
 - **Deployment — planned:** no staging/production environment, production SMTP, monitored Supabase project, Android signing, or store release is configured.
 
-### Security boundary
+### Security and truth boundary
 
 Supabase owns authentication credentials, email verification, and refresh-token rotation. ArenaSports owns:
 
 - stable internal user IDs;
-- public profile and normalized handle;
+- public ArenaSports profile and normalized handle;
+- public game identities and their truth labels;
 - account status;
 - platform/resource roles;
 - observed session inventory and local revocation deny-list;
 - authorization decisions;
-- security audit events;
+- security and competition audit events;
 - all competition state.
 
-ArenaSports never stores passwords, OTP codes, access tokens, refresh tokens, game passwords, or Supabase secret/service-role keys.
+ArenaSports never stores passwords, OTP codes, access tokens, refresh tokens, game passwords, game login codes, recovery credentials, or Supabase secret/service-role keys.
+
+A public username match is not publisher verification. Every new game profile starts `UNVERIFIED`. `COMMUNITY_CONFIRMED` means an ArenaSports community review only. `AUTHORIZED_PROVIDER_VERIFIED` remains reserved for a future authorized provider integration.
 
 ### Validation boundary
 
-Clean GitHub-hosted CI verifies formatting, Prisma schema/client generation, migration deployment from zero, strict TypeScript, contracts/domain/API/database tests, package builds, Expo Android export, and compiled API health startup.
+Clean GitHub-hosted CI verifies formatting, Prisma schema/client generation, both migration deployments from zero, strict TypeScript, contracts/domain/API/database tests, package builds, Expo Android export, and compiled API health startup.
 
 Still required outside CI:
 
 - configure and test a real non-production Supabase project;
 - configure production-quality SMTP and OTP template/rate limits;
-- exercise the full sign-in/onboarding/session flow on an Android emulator and physical device;
-- test Ghana-representative mobile connectivity, accessibility, and recovery;
-- approve project region, privacy/processor terms, age model, and operational owners;
-- require stronger authentication for moderator and administrator operations before launch.
+- exercise account and game-profile flows on Android emulator and physical devices;
+- test Ghana-representative mobile connectivity, accessibility, large fonts, screen readers, and recovery;
+- approve project region, privacy/processor terms, game-profile challenge retention, age model, and operational owners;
+- require stronger authentication for moderator and administrator operations;
+- implement audited ownership-challenge resolution before staff enforcement.
 
 The exact evidence and limitations are recorded in [Validation](docs/VALIDATION.md) and [Current Handoff](docs/HANDOFF.md).
 
@@ -63,9 +70,9 @@ The exact evidence and limitations are recorded in [Validation](docs/VALIDATION.
 
 Continue in dependency order; do not jump directly to brackets, evidence, or social features.
 
-1. Close the remaining live-provider/device gates for AS-02 without weakening the current security boundary.
-2. Implement **AS-03 game profiles**: game, platform, region, public username, normalization, visibility, duplicate/impersonation safeguards, and accurate `UNVERIFIED` / `COMMUNITY_CONFIRMED` labels.
-3. Replace the in-memory tournament repository with PostgreSQL for **AS-04**, then implement versioned draft/publication/cancellation.
+1. Preserve the AS-02 account/session and AS-03 game-profile boundaries.
+2. Close their live provider/device/support gates without weakening truth or privacy.
+3. Implement **AS-04 tournament draft and publication**: PostgreSQL repository, owner-scoped authorization, optimistic versions, ruleset preview/digest, immutable publication, visibility, cancellation reasons, audit, API, mobile, and tests.
 4. Add registration, waitlists, rules acknowledgement, and deterministic fixtures in backlog order.
 
 Do not request game passwords, scrape publishers, intercept game traffic, or call username matching official result verification.
@@ -108,7 +115,7 @@ These are MVP targets, not all currently implemented.
 
 A matching username is **not** an API and cannot retrieve a result from eFootball or FC Mobile.
 
-ArenaSports will never request a player's game password, intercept game traffic, bypass anti-cheat controls, or present unofficial scraping as official verification. Until a publisher provides an authorized API or partnership, the result workflow is:
+ArenaSports will never request a player’s game password, intercept game traffic, bypass anti-cheat controls, or present unofficial scraping as official verification. Until a publisher provides an authorized API or partnership, the result workflow is:
 
 1. both players check in;
 2. the platform issues a match reference;
@@ -135,7 +142,7 @@ ArenaSports starts as a **modular monolith** so a small team can ship safely wit
 - **Repository:** pnpm workspace
 - **Quality:** TypeScript, Vitest, Prettier, GitHub Actions
 
-See [Architecture](docs/ARCHITECTURE.md), [Authentication ADR](docs/ADR/0002-supabase-authentication.md), and [Data Model](docs/DATA_MODEL.md).
+See [Architecture](docs/ARCHITECTURE.md), [Authentication ADR](docs/ADR/0002-supabase-authentication.md), [Game Profile Policy](docs/GAME_PROFILE_POLICY.md), and [Data Model](docs/DATA_MODEL.md).
 
 ## Repository layout
 
@@ -145,13 +152,14 @@ apps/
   mobile/              Expo Android/iOS application
 packages/
   contracts/           Shared schemas, enums, and API types
-  database/            Prisma schema, migration, and database client
+  database/            Prisma schema, migrations, and database client
 docs/
   ADR/                 Architecture decisions
   API.md               API conventions and endpoint status
   ARCHITECTURE.md      System design and trust boundaries
   DATA_MODEL.md        Entity and lifecycle reference
   EXECUTION_BACKLOG.md Ordered implementation slices and acceptance gates
+  GAME_PROFILE_POLICY.md
   GHANA_LAUNCH_PLAN.md Closed-pilot readiness and launch gates
   HANDOFF.md           Current state for the next developer or AI
   LOCAL_DEVELOPMENT.md Setup and authentication configuration
@@ -219,20 +227,21 @@ See [Local Development](docs/LOCAL_DEVELOPMENT.md) for Supabase and device confi
 2. [Product Requirements](docs/PRODUCT_REQUIREMENTS.md)
 3. [Architecture](docs/ARCHITECTURE.md)
 4. [Authentication ADR](docs/ADR/0002-supabase-authentication.md)
-5. [Match Verification](docs/MATCH_VERIFICATION.md)
-6. [Data Model](docs/DATA_MODEL.md)
-7. [API Contract](docs/API.md)
-8. [Execution Backlog](docs/EXECUTION_BACKLOG.md)
-9. [Test Strategy](docs/TEST_STRATEGY.md)
-10. [Moderation Operations](docs/MODERATION_OPERATIONS.md)
-11. [Ghana Launch Plan](docs/GHANA_LAUNCH_PLAN.md)
-12. [Roadmap](docs/ROADMAP.md)
-13. [Validation](docs/VALIDATION.md)
-14. [Current Handoff](docs/HANDOFF.md)
+5. [Game Profile Policy](docs/GAME_PROFILE_POLICY.md)
+6. [Match Verification](docs/MATCH_VERIFICATION.md)
+7. [Data Model](docs/DATA_MODEL.md)
+8. [API Contract](docs/API.md)
+9. [Execution Backlog](docs/EXECUTION_BACKLOG.md)
+10. [Test Strategy](docs/TEST_STRATEGY.md)
+11. [Moderation Operations](docs/MODERATION_OPERATIONS.md)
+12. [Ghana Launch Plan](docs/GHANA_LAUNCH_PLAN.md)
+13. [Roadmap](docs/ROADMAP.md)
+14. [Validation](docs/VALIDATION.md)
+15. [Current Handoff](docs/HANDOFF.md)
 
 ## Contributing and security
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md). Never put secrets, signing keys, player identity documents, private evidence, access tokens, refresh tokens, OTP codes, or production data in an issue.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before opening a pull request. Report vulnerabilities privately as described in [SECURITY.md](SECURITY.md). Never put secrets, signing keys, player identity documents, private evidence, access tokens, refresh tokens, OTP codes, game credentials, ownership-challenge statements, or production data in an issue.
 
 ## License
 
