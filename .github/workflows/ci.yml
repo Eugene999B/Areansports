@@ -71,6 +71,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Format workspace for artifact
+        run: pnpm format
+
+      - name: Collect formatted files
+        run: |
+          mkdir -p /tmp/arenasports-format
+          git diff --name-only > /tmp/arenasports-format/files.txt
+          git diff --name-only -z | tar --null -T - -cf /tmp/arenasports-format/formatted-files.tar
+
+      - name: Upload formatted files
+        uses: actions/upload-artifact@v4
+        with:
+          name: arenasports-as03-formatted-files
+          path: /tmp/arenasports-format
+          retention-days: 3
+
       - name: Check formatting
         run: pnpm format:check
 
