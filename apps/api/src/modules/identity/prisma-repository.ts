@@ -127,8 +127,8 @@ export class PrismaIdentityRepository implements IdentityRepository {
               create: {
                 providerSessionId: principal.providerSessionId,
                 expiresAt: principal.expiresAt,
-                userAgentHash: security.userAgentHash,
-                ipHash: security.ipHash,
+                ...(security.userAgentHash ? { userAgentHash: security.userAgentHash } : {}),
+                ...(security.ipHash ? { ipHash: security.ipHash } : {}),
               },
             },
           },
@@ -181,14 +181,19 @@ export class PrismaIdentityRepository implements IdentityRepository {
         const user = await transaction.user.update({
           where: { id: userId },
           data: {
-            handle: input.handle?.trim(),
-            normalizedHandle: input.handle ? normalizeHandle(input.handle) : undefined,
-            displayName: input.displayName?.trim(),
-            countryCode: input.countryCode,
-            timezone: input.timezone,
-            avatarUrl: input.avatarUrl,
-            profileVisible: input.profileVisible,
-            notificationPreferences: input.notificationPreferences,
+            ...(input.handle
+              ? { handle: input.handle.trim(), normalizedHandle: normalizeHandle(input.handle) }
+              : {}),
+            ...(input.displayName ? { displayName: input.displayName.trim() } : {}),
+            ...(input.countryCode ? { countryCode: input.countryCode } : {}),
+            ...(input.timezone ? { timezone: input.timezone } : {}),
+            ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
+            ...(input.profileVisible !== undefined
+              ? { profileVisible: input.profileVisible }
+              : {}),
+            ...(input.notificationPreferences
+              ? { notificationPreferences: input.notificationPreferences }
+              : {}),
           },
           include: {
             roleAssignments: {
@@ -248,8 +253,8 @@ export class PrismaIdentityRepository implements IdentityRepository {
           userId,
           providerSessionId: principal.providerSessionId,
           expiresAt: principal.expiresAt,
-          userAgentHash: security.userAgentHash,
-          ipHash: security.ipHash,
+          ...(security.userAgentHash ? { userAgentHash: security.userAgentHash } : {}),
+          ...(security.ipHash ? { ipHash: security.ipHash } : {}),
         },
       });
       await transaction.auditEvent.create({
