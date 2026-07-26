@@ -10,11 +10,7 @@ import {
 } from '@arenasports/contracts';
 import type { DatabaseClient } from '@arenasports/database';
 import { AppError } from '../../errors.js';
-import type {
-  ExternalPrincipal,
-  IdentityRepository,
-  RequestSecurityContext,
-} from './types.js';
+import type { ExternalPrincipal, IdentityRepository, RequestSecurityContext } from './types.js';
 
 type StoredUser = {
   id: string;
@@ -49,9 +45,7 @@ function mapUser(user: StoredUser): CurrentUser {
 }
 
 function isUniqueConstraintError(error: unknown): boolean {
-  return Boolean(
-    error && typeof error === 'object' && 'code' in error && error.code === 'P2002',
-  );
+  return Boolean(error && typeof error === 'object' && 'code' in error && error.code === 'P2002');
 }
 
 export class PrismaIdentityRepository implements IdentityRepository {
@@ -188,9 +182,7 @@ export class PrismaIdentityRepository implements IdentityRepository {
             ...(input.countryCode ? { countryCode: input.countryCode } : {}),
             ...(input.timezone ? { timezone: input.timezone } : {}),
             ...(input.avatarUrl !== undefined ? { avatarUrl: input.avatarUrl } : {}),
-            ...(input.profileVisible !== undefined
-              ? { profileVisible: input.profileVisible }
-              : {}),
+            ...(input.profileVisible !== undefined ? { profileVisible: input.profileVisible } : {}),
             ...(input.notificationPreferences
               ? { notificationPreferences: input.notificationPreferences }
               : {}),
