@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -56,8 +56,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -72,19 +70,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Commit mobile authentication dependencies
-        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/as-02-identity-sessions'
-        run: |
-          if ! grep -q '"@supabase/supabase-js"' apps/mobile/package.json; then
-            pnpm --filter @arenasports/mobile add @supabase/supabase-js react-native-url-polyfill
-            pnpm --filter @arenasports/mobile exec expo install expo-secure-store
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add apps/mobile/package.json pnpm-lock.yaml
-            git commit -m "Add mobile authentication dependencies"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
 
       - name: Check formatting
         run: pnpm format:check
