@@ -1,7 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { database } from '@arenasports/database';
 import { afterAll, describe, expect, it } from 'vitest';
-import { AppError } from '../src/errors.js';
 import { PrismaIdentityRepository } from '../src/modules/identity/prisma-repository.js';
 import { IdentityService } from '../src/modules/identity/service.js';
 import type { ExternalIdentityVerifier, ExternalPrincipal } from '../src/modules/identity/types.js';
@@ -119,17 +118,22 @@ describe('Prisma identity repository', () => {
     ).rejects.toMatchObject({ code: 'SESSION_REVOKED' });
   });
 
-  it('enforces suspended account status after provider authentication', async () => {
+  it.each([
+    ['SUSPENDED', 'ACCOUNT_SUSPENDED'],
+    ['DELETED', 'ACCOUNT_DELETED'],
+  ] as const)('denies %s accounts after provider authentication', async (accountStatus, errorCode) => {
     const suffix = randomUUID();
     const principal = buildPrincipal(suffix);
-    const user = await createAccount(suffix, `sus_${suffix.replaceAll('-', '').slice(0, 12)}`);
-    await database.user.update({ where: { id: user.id }, data: { status: 'SUSPENDED' } });
+    const prefix = accountStatus === 'SUSPENDED' ? 'sus' : 'del';
+    const user = await createAccount(
+      suffix,
+      `${prefix}_${suffix.replaceAll('-', '').slice(0, 12)}`,
+    );
+    await database.user.update({ where: { id: user.id }, data: { status: accountStatus } });
 
     const service = new IdentityService(new FixedVerifier(principal), repository);
-    const authentication = service.authenticate('test-token', {
-      requestId: `test-${randomUUID()}`,
-    });
-    await expect(authentication).rejects.toBeInstanceOf(AppError);
-    await expect(authentication).rejects.toMatchObject({ code: 'ACCOUNT_SUSPENDED' });
+    await expect(
+      service.authenticate('test-token', { requestId: `test-${randomUUID()}` }),
+    ).rejects.toMatchObject({ code: errorCode });
   });
 });
