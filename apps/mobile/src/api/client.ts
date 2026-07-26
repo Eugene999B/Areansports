@@ -54,10 +54,6 @@ export type AccountProfileInput = {
   notificationPreferences?: NotificationPreferences;
 };
 
-type TournamentListResponse = {
-  data: TournamentSummary[];
-};
-
 type ApiErrorResponse = {
   error?: {
     code?: string;
@@ -119,7 +115,8 @@ async function requestData<T>(path: string, options: RequestOptions = {}): Promi
           (response.status >= 500
             ? 'ArenaSports is temporarily unavailable.'
             : 'The request could not be completed.'),
-        errorPayload?.error?.retryable ?? response.status >= 500 || response.status === 429,
+        errorPayload?.error?.retryable ??
+          (response.status >= 500 || response.status === 429),
         errorPayload?.error?.code ?? 'REQUEST_FAILED',
         response.status,
         errorPayload?.error?.details ?? {},
@@ -138,25 +135,8 @@ async function requestData<T>(path: string, options: RequestOptions = {}): Promi
   }
 }
 
-export async function fetchPublicTournaments(signal?: AbortSignal): Promise<TournamentSummary[]> {
-  const response = await fetch(`${API_URL}/tournaments`, {
-    headers: { Accept: 'application/json' },
-    ...(signal ? { signal } : {}),
-  });
-
-  if (!response.ok) {
-    throw new ApiClientError(
-      response.status >= 500
-        ? 'ArenaSports is temporarily unavailable.'
-        : 'Tournament discovery could not be loaded.',
-      response.status >= 500 || response.status === 429,
-      'TOURNAMENT_DISCOVERY_FAILED',
-      response.status,
-    );
-  }
-
-  const payload = (await response.json()) as TournamentListResponse;
-  return payload.data;
+export function fetchPublicTournaments(signal?: AbortSignal): Promise<TournamentSummary[]> {
+  return requestData('/tournaments', signal ? { signal } : {});
 }
 
 export function fetchCurrentUser(accessToken: string): Promise<CurrentUser> {
