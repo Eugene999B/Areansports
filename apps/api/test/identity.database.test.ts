@@ -4,10 +4,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { AppError } from '../src/errors.js';
 import { PrismaIdentityRepository } from '../src/modules/identity/prisma-repository.js';
 import { IdentityService } from '../src/modules/identity/service.js';
-import type {
-  ExternalIdentityVerifier,
-  ExternalPrincipal,
-} from '../src/modules/identity/types.js';
+import type { ExternalIdentityVerifier, ExternalPrincipal } from '../src/modules/identity/types.js';
 
 const repository = new PrismaIdentityRepository(database);
 const createdUserIds: string[] = [];
@@ -129,7 +126,9 @@ describe('Prisma identity repository', () => {
     await database.user.update({ where: { id: user.id }, data: { status: 'SUSPENDED' } });
 
     const service = new IdentityService(new FixedVerifier(principal), repository);
-    const authentication = service.authenticate('test-token', { requestId: `test-${randomUUID()}` });
+    const authentication = service.authenticate('test-token', {
+      requestId: `test-${randomUUID()}`,
+    });
     await expect(authentication).rejects.toBeInstanceOf(AppError);
     await expect(authentication).rejects.toMatchObject({ code: 'ACCOUNT_SUSPENDED' });
   });
