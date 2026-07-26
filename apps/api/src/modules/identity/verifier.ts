@@ -4,9 +4,9 @@ import type { ExternalIdentityVerifier, ExternalPrincipal } from './types.js';
 
 const SupabaseUserSchema = z.object({
   id: z.string().min(1),
-  email: z.string().email().nullable().optional(),
+  email: z.string().trim().email().nullable().optional(),
   email_confirmed_at: z.string().datetime({ offset: true }).nullable().optional(),
-  phone: z.string().nullable().optional(),
+  phone: z.string().trim().nullable().optional(),
   phone_confirmed_at: z.string().datetime({ offset: true }).nullable().optional(),
 });
 
@@ -87,11 +87,11 @@ export class SupabaseIdentityVerifier implements ExternalIdentityVerifier {
     return {
       provider: 'SUPABASE',
       subject: parsedUser.data.id,
-      email: parsedUser.data.email?.trim().toLocaleLowerCase('en-US') ?? null,
+      email: parsedUser.data.email?.toLocaleLowerCase('en-US') ?? null,
       emailVerifiedAt: parsedUser.data.email_confirmed_at
         ? new Date(parsedUser.data.email_confirmed_at)
         : null,
-      phone: parsedUser.data.phone?.trim() ?? null,
+      phone: parsedUser.data.phone ?? null,
       phoneVerifiedAt: parsedUser.data.phone_confirmed_at
         ? new Date(parsedUser.data.phone_confirmed_at)
         : null,
