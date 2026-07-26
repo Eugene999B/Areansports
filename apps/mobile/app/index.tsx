@@ -1,11 +1,18 @@
 import { Link, router } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '../src/auth/AuthProvider';
 import { PrimaryButton } from '../src/components/PrimaryButton';
 import { Screen } from '../src/components/Screen';
 import { StatusPill } from '../src/components/StatusPill';
 import { colors, radius, spacing } from '../src/theme';
 
 export default function HomeScreen() {
+  const { status, user } = useAuth();
+  const signedIn = status === 'authenticated' && user;
+  const canOrganize = Boolean(
+    user?.roles.some((role) => role === 'ORGANIZER' || role === 'ADMINISTRATOR'),
+  );
+
   return (
     <Screen>
       <View style={styles.brandRow}>
@@ -13,7 +20,10 @@ export default function HomeScreen() {
           <Text style={styles.markText}>A</Text>
         </View>
         <Text style={styles.brand}>ArenaSports</Text>
-        <StatusPill label="Foundation" />
+        <StatusPill
+          label={signedIn ? 'SIGNED IN' : 'FREE PILOT'}
+          tone={signedIn ? 'success' : 'neutral'}
+        />
       </View>
 
       <View style={styles.hero}>
@@ -31,16 +41,42 @@ export default function HomeScreen() {
         onPress={() => router.push('/tournaments')}
       />
 
-      <Link href="/create-tournament" style={styles.secondaryLink}>
-        Create a free tournament
+      <Link href="/game-profiles/find" style={styles.secondaryLink}>
+        Find a player's public game identity
       </Link>
+
+      {signedIn ? (
+        <>
+          <Link href="/game-profiles" style={styles.secondaryLink}>
+            Manage your eFootball or FC Mobile identity
+          </Link>
+          <Link href="/account" style={styles.secondaryLink}>
+            Open @{user.handle}'s account
+          </Link>
+        </>
+      ) : (
+        <Link href="/auth/sign-in" style={styles.secondaryLink}>
+          Sign in or create an account
+        </Link>
+      )}
+
+      {canOrganize ? (
+        <>
+          <Link href="/organizer/tournaments" style={styles.secondaryLink}>
+            Manage your tournaments
+          </Link>
+          <Link href="/create-tournament" style={styles.secondaryLink}>
+            Create a free tournament
+          </Link>
+        </>
+      ) : null}
 
       <View style={styles.trustCard}>
         <Text style={styles.cardTitle}>How ArenaSports protects competition</Text>
-        <Text style={styles.cardLine}>? Published, versioned tournament rules</Text>
-        <Text style={styles.cardLine}>? Opponent confirmation and private evidence</Text>
-        <Text style={styles.cardLine}>? Audited disputes, forfeits, and corrections</Text>
-        <Text style={styles.cardLine}>? No game passwords and no fake API claims</Text>
+        <Text style={styles.cardLine}>• Published, versioned tournament rules</Text>
+        <Text style={styles.cardLine}>• Opponent confirmation and private evidence</Text>
+        <Text style={styles.cardLine}>• Audited disputes, forfeits, and corrections</Text>
+        <Text style={styles.cardLine}>• No game passwords and no fake API claims</Text>
       </View>
 
       <Text style={styles.disclaimer}>

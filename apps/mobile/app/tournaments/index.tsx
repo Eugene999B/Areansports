@@ -14,7 +14,7 @@ import { colors, radius, spacing } from '../../src/theme';
 function TournamentCard({ tournament }: { tournament: TournamentSummary }) {
   const occupancy = `${tournament.acceptedParticipants}/${tournament.capacity}`;
   return (
-    <Link href={{ pathname: '/tournaments/[id]', params: { id: tournament.id } }} asChild>
+    <Link href={{ pathname: '/tournaments/[id]', params: { id: tournament.slug } }} asChild>
       <Pressable
         accessibilityRole="button"
         accessibilityHint="Opens tournament details"
@@ -26,7 +26,8 @@ function TournamentCard({ tournament }: { tournament: TournamentSummary }) {
         </View>
         <Text style={styles.cardTitle}>{tournament.title}</Text>
         <Text style={styles.meta}>
-          {tournament.platform} ? {tournament.region} ? {tournament.format.replaceAll('_', ' ')}
+          {tournament.game.name} · {tournament.platform} · {tournament.region} ·{' '}
+          {tournament.format.replaceAll('_', ' ')}
         </Text>
         <Text style={styles.starts}>Starts {new Date(tournament.startsAt).toLocaleString()}</Text>
       </Pressable>
@@ -69,7 +70,7 @@ export default function TournamentDiscoveryScreen() {
       {loading ? (
         <View style={styles.center}>
           <ActivityIndicator color={colors.primary} size="large" />
-          <Text style={styles.muted}>Loading tournaments?</Text>
+          <Text style={styles.muted}>Loading tournaments…</Text>
         </View>
       ) : message ? (
         <View style={styles.center}>
@@ -82,8 +83,7 @@ export default function TournamentDiscoveryScreen() {
         <View style={styles.center}>
           <Text style={styles.emptyTitle}>No public tournaments yet</Text>
           <Text style={styles.muted}>
-            The foundation API is connected, but no organizer has created a public draft in this
-            environment.
+            No organizer has published a discoverable tournament in this environment.
           </Text>
         </View>
       ) : (

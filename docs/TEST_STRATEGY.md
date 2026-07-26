@@ -1,32 +1,63 @@
 # ArenaSports test strategy
 
-ArenaSports tests protect competition truth, player safety, and recoverability. Passing a few happy-path screens is not enough: the system must remain correct under retries, concurrency, conflicting evidence, clock boundaries, moderator mistakes, and unreliable networks.
+ArenaSports tests protect competition truth, player safety, and recoverability. Passing a few happy-path screens is not enough: the system must remain correct under retries, concurrency, conflicting evidence, clock boundaries, moderator mistakes, unreliable networks, expired sessions, and provider failures.
 
 ## Quality objectives
 
 1. Final match results cannot be created through an unauthorized or ambiguous path.
 2. Fixtures, standings, and tie-breaks are deterministic and explainable.
-3. Mobile retries cannot duplicate registrations, check-ins, submissions, or decisions.
+3. Mobile retries cannot duplicate registrations, check-ins, submissions, decisions, or account bootstrap.
 4. Evidence remains private and access is auditable.
 5. Operators can recover from failures without silently rewriting history.
 6. Critical flows remain usable on low-bandwidth Android devices.
+7. Authentication proves identity without allowing provider claims to grant ArenaSports privileges.
 
 ## Test layers
 
-| Layer                  | Purpose                                                             | Required examples                                                          |
-| ---------------------- | ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| Schema/contract        | Reject malformed or incompatible inputs                             | Zod request/response fixtures, error envelopes, enum compatibility         |
-| Domain unit            | Prove pure competition rules                                        | transitions, scoring, tie-breaks, no-show policy, result normalization     |
-| Repository integration | Prove database constraints and transactions                         | capacity races, unique registration, version conflicts, outbox atomicity   |
-| API integration        | Prove authentication, authorization, idempotency, and HTTP behavior | role matrix, duplicate keys, stale versions, safe errors                   |
-| Mobile component       | Prove visible states and accessible actions                         | loading, empty, error, offline, disabled, screen-reader labels             |
-| End-to-end             | Prove complete user outcomes                                        | create, publish, join, fixture, submit, confirm, finalize                  |
-| Operational            | Prove deployment and recovery                                       | migrations, backup restore, secret/config validation, rollback drill       |
-| Security/adversarial   | Prove abuse resistance                                              | IDOR, privilege escalation, forged evidence ownership, replay, rate limits |
+| Layer                  | Purpose                                                             | Required examples                                                        |
+| ---------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| Schema/contract        | Reject malformed or incompatible inputs                             | Zod request/response fixtures, errors, handle normalization              |
+| Domain unit            | Prove pure competition and authorization rules                      | transitions, scoring, role matrix, no-show policy                        |
+| Repository integration | Prove database constraints and transactions                         | identity bootstrap, capacity races, version conflicts, audit atomicity   |
+| API integration        | Prove authentication, authorization, idempotency, and HTTP behavior | account status, session revoke, role matrix, duplicate keys, safe errors |
+| Provider-boundary unit | Prove external authentication mapping and failure handling          | expiry, subject mismatch, unavailable provider, verified contact         |
+| Mobile component/flow  | Prove visible states and accessible actions                         | signed out, onboarding, offline, error, retry, disabled, screen reader   |
+| End-to-end             | Prove complete user outcomes                                        | sign in/profile/session; create/publish/join/fixture/submit/finalize     |
+| Operational            | Prove deployment and recovery                                       | migrations, backup restore, secret/config validation, rollback drill     |
+| Security/adversarial   | Prove abuse resistance                                              | IDOR, privilege escalation, replay, forged ownership, rate limits        |
 
-The test pyramid should be broad at the pure-domain layer, focused at database/API integration, and small but high-value at end-to-end.
+The test pyramid should be broad at pure-domain/provider-boundary layers, focused at database/API integration, and small but high-value at end-to-end.
 
-## Required domain matrices
+## Identity and session matrix
+
+AS-02 automated coverage includes:
+
+- valid remotely verified provider subject mapping;
+- expired token rejected before provider contact;
+- provider subject mismatch rejected;
+- provider outage mapped to a safe retryable error;
+- verified email required for pilot bootstrap;
+- unique normalized handle across casing and whitespace;
+- one provider subject mapped to one ArenaSports user;
+- transactional user, external identity, role, session, and audit creation;
+- default `PLAYER` role only;
+- player/organizer/moderator/administrator role separation;
+- locally revoked provider session denied;
+- suspended and deleted account denial;
+- session list scoped to the authenticated user;
+- authorization and cookie headers redacted from logs;
+- no raw token or OTP persistence.
+
+Still required outside clean CI:
+
+- real Supabase OTP delivery and verification;
+- secure-store restoration on emulator and physical device;
+- refresh expiry while offline and after app restart;
+- provider-side sign-out/revocation interaction;
+- rate-limit and abuse-control testing with the configured SMTP/provider project;
+- stronger moderator/administrator authentication exercise.
+
+## Required competition matrices
 
 ### Tournament lifecycle
 
@@ -40,8 +71,8 @@ For each transition, assert:
 - preconditions and version;
 - timestamp boundaries;
 - audit event and reason requirement;
-- idempotent repeat behavior;
-- derived notification/outbox behavior.
+- idempotent repeat behaviour;
+- derived notification/outbox behaviour.
 
 ### Registration and capacity
 
@@ -104,15 +135,16 @@ Maintain a table for every endpoint with anonymous, player, assigned participant
 
 At minimum, test:
 
+- missing, malformed, expired, revoked, suspended, and deleted authentication;
+- provider roles/metadata never granting ArenaSports roles;
 - object-level authorization against guessed IDs;
 - tournament ownership and scoped moderator assignment;
 - evidence download permissions and expired URLs;
 - hidden/unlisted tournament discovery;
-- suspended and deleted user behavior;
 - organizer inability to decide a dispute in which the organizer participates;
-- client inability to write standings, audit events, or final resolutions directly.
+- client inability to write standings, audit events, roles, or final resolutions directly.
 
-A new endpoint is incomplete until its deny cases are tested.
+A new protected endpoint is incomplete until its deny cases are tested.
 
 ## Idempotency and concurrency
 
@@ -125,7 +157,7 @@ For every retryable mutation:
 5. simulate concurrent requests in separate database transactions;
 6. assert capacity, version, uniqueness, and audit invariants.
 
-Critical race tests include final registration slot, tournament publication, fixture generation, match finalization, moderator claim, and appeal decision.
+Critical race tests include normalized handle/provider bootstrap, final registration slot, tournament publication, fixture generation, match finalization, moderator claim, and appeal decision.
 
 ## Mobile and network conditions
 
@@ -136,13 +168,15 @@ Exercise critical screens under:
 - offline start and reconnect;
 - duplicated tap/retry;
 - stale cached tournament version;
-- expired session during mutation;
+- expired or revoked session during mutation;
+- provider refresh failure;
+- app restart with secure session restoration;
 - image upload interruption;
 - low-memory app restart;
 - small screen, large font, screen reader, and high contrast;
 - Ghana/Africa/Accra display plus a different device timezone.
 
-The UI must distinguish `not sent`, `sending`, `accepted`, `pending confirmation`, `disputed`, and `failed safely` states.
+The UI must distinguish `not sent`, `sending`, `accepted`, `needs profile`, `authenticated`, `pending confirmation`, `disputed`, `expired/revoked`, and `failed safely` states.
 
 ## Evidence security tests
 
@@ -153,7 +187,7 @@ The UI must distinguish `not sent`, `sending`, `accepted`, `pending confirmation
 - deny cross-case object access;
 - redact storage keys and signed URLs from logs;
 - record access audit events;
-- verify retention expiry and legal/safety hold behavior;
+- verify retention expiry and legal/safety hold behaviour;
 - test malware/quarantine state without exposing the file to moderators.
 
 Real player evidence must never be used in automated tests.
@@ -170,24 +204,25 @@ Initial pilot targets are engineering objectives, not public promises:
 - evidence upload failure produces a resumable/retryable state;
 - notification failure does not block match finalization.
 
-Load profiles must include deadline bursts rather than only uniform traffic.
+Load profiles must include sign-in/recovery bursts and competition deadline bursts rather than only uniform traffic.
 
 ## Test data
 
 - use deterministic factories with explicit timestamps and seeded randomness;
-- use fictional handles, game usernames, and evidence;
+- use fictional handles, emails, game usernames, and evidence;
 - never copy production data into development or CI;
-- freeze time for deadline tests;
+- freeze time for deadline/token-expiry tests where appropriate;
 - retain failure seeds for property-based tests;
 - keep a small canonical completed-tournament fixture for regression tests.
 
 ## Clean CI pipeline
 
-The intended validation order is:
+The validation order is:
 
 ```text
-install -> format -> Prisma validate/generate -> typecheck -> unit tests
--> integration tests -> build -> Expo export -> dependency/security checks
+frozen install -> format -> Prisma validate/generate -> migrate from zero
+-> strict typecheck -> contract/unit/provider/API/database tests
+-> package builds -> Expo Android export -> compiled API smoke
 ```
 
 Database integration runs against a disposable PostgreSQL service with migrations applied from zero. Tests must not depend on order or shared residue.
@@ -198,13 +233,13 @@ Minimum commands:
 pnpm install --frozen-lockfile
 pnpm format:check
 pnpm --filter @arenasports/database db:validate
-pnpm db:generate
+pnpm --filter @arenasports/database db:deploy
 pnpm typecheck
 pnpm test
 pnpm build
 ```
 
-The repository currently cannot execute this pipeline because the GitHub account is billing-locked. See `docs/VALIDATION.md`; do not interpret the blocked workflow as a code failure or success.
+GitHub Actions is operational. Exact successful runs and limitations are recorded in `docs/VALIDATION.md`.
 
 ## Release evidence
 
@@ -213,6 +248,7 @@ Each release candidate records:
 - commit SHA and dependency lockfile;
 - CI run links and exact tool versions;
 - migration apply and recovery results;
+- live authentication provider/project configuration exercised;
 - Android device/API versions exercised;
 - critical end-to-end scenario results;
 - accessibility and low-bandwidth observations;
@@ -234,6 +270,7 @@ Each release candidate records:
 The pilot may begin only when:
 
 - AS-01 validation is complete;
+- AS-02 live-provider/device gates are complete;
 - all S0/S1 defects are closed;
 - critical scenario tests pass;
 - backup restore and rollback are demonstrated;

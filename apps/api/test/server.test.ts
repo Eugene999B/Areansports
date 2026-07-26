@@ -44,13 +44,13 @@ describe('API foundation', () => {
     expect(response.json().error.code).toBe('AUTHENTICATION_REQUIRED');
   });
 
-  it('creates and discovers a public draft only when demo auth is enabled', async () => {
+  it('creates a private draft only when demo auth is enabled', async () => {
     const server = await createServer(true);
     const payload = {
       title: 'Accra Weekend League',
       description: 'Community competition',
-      gameId: 'game_efootball',
-      platform: 'MOBILE',
+      gameSlug: 'efootball',
+      platform: 'ANDROID',
       region: 'GH',
       timezone: 'Africa/Accra',
       visibility: 'PUBLIC',
@@ -59,12 +59,16 @@ describe('API foundation', () => {
       registrationOpensAt: '2026-08-01T08:00:00Z',
       registrationClosesAt: '2026-08-05T20:00:00Z',
       startsAt: '2026-08-06T18:00:00Z',
+      rules: {},
     };
 
     const created = await server.inject({
       method: 'POST',
       url: '/v1/tournaments',
-      headers: { 'x-demo-user-id': 'user_demo' },
+      headers: {
+        'x-demo-user-id': 'user_demo',
+        'idempotency-key': 'demo-create-key-0001',
+      },
       payload,
     });
 
@@ -76,7 +80,6 @@ describe('API foundation', () => {
     });
 
     expect(listed.statusCode).toBe(200);
-    expect(listed.json().data).toHaveLength(1);
-    expect(listed.json().data[0].title).toBe(payload.title);
+    expect(listed.json().data).toEqual([]);
   });
 });
