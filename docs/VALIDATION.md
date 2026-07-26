@@ -1,5 +1,113 @@
 # Validation record
 
+## 2026-07-26 AS-03 game profile checkpoint
+
+**Branch:** `agent/as-03-game-profiles`  
+**Stacked draft PR:** [#5](https://github.com/Eugene999B/Areansports/pull/5)  
+**Validated implementation commit:** `d46e34a67dfdb1ed38901e92ab87ab06b59fddc8`  
+**Pull-request CI:** [run 30200267481](https://github.com/Eugene999B/Areansports/actions/runs/30200267481)  
+**Result:** Passed
+
+PR #5 is stacked on the AS-02 branch for review. It was temporarily retargeted to `main` only so the repository’s existing pull-request workflow would execute; it must be restored to `agent/as-02-identity-sessions` before the session closes.
+
+The validated implementation commit contains the formatted AS-03 code, contracts, schema, migrations, mobile screens, tests, policy, and restored read-only CI workflow. Later commits update durable documentation only.
+
+### Clean environment
+
+- GitHub-hosted Ubuntu 24.04 runner.
+- Node.js 22.13.0.
+- pnpm 11.17.0 with frozen lockfile installation.
+- PostgreSQL 18 Alpine and Redis 8 Alpine service containers.
+- Prisma 7.9.0.
+- Expo SDK 57 / React Native 0.86 Android export.
+- Read-only final GitHub Actions repository permission.
+- No persistent local ArenaSports checkout, hidden developer state, or real user data.
+
+### Passed gates
+
+- `pnpm install --frozen-lockfile`.
+- Repository-wide Prettier formatting check.
+- Prisma schema validation and client generation.
+- Deployment of `20260726090000_initial_foundation` followed by `20260726110000_game_profiles` from zero to disposable PostgreSQL.
+- Strict TypeScript checking across contracts, database, API, and mobile packages.
+- **44 automated tests passed:**
+  - 31 foundation/AS-02 tests;
+  - 4 AS-03 shared-contract tests;
+  - 4 AS-03 in-memory/API tests;
+  - 5 AS-03 PostgreSQL integration tests.
+- Contracts, database package, Fastify API, and Expo mobile package builds.
+- Expo Android export.
+- Compiled API startup followed by a successful `/health/live` request.
+- Clean PostgreSQL and Redis service teardown.
+
+### Game-profile cases verified
+
+- Catalogue migration seeds eFootball and EA SPORTS FC Mobile.
+- New profiles always start `UNVERIFIED`.
+- Client inputs cannot set verification state.
+- Public username inputs contain no game credential field.
+- Unicode NFKC converts compatibility-width variants before comparison.
+- Leading/trailing and repeated whitespace are normalized.
+- Username comparison is case-insensitive.
+- Control, zero-width, and bidirectional spoofing characters are rejected.
+- Duplicate normalized username is rejected within one game/platform/region.
+- One user cannot occupy the same game/platform/region slot twice.
+- Profile create/update state and audit event commit transactionally.
+- Optimistic version guards reject stale edits.
+- Hidden profiles do not appear in public lookup.
+- Public lookup is limited to active, public ArenaSports accounts and visible game profiles.
+- Opening a challenge against one’s own profile is rejected.
+- Duplicate simultaneous ownership challenges are rejected.
+- Challenge creation and audit event commit transactionally.
+- Challenge statements are private and are not copied into audit metadata.
+- Opening a challenge does not change visibility, owner, account status, or truth label.
+
+### Mobile/build cases verified by clean build
+
+- Authenticated game-profile management route compiles.
+- Public player-handle lookup route compiles without requiring sign-in.
+- Sign-in-gated ownership challenge flow compiles.
+- Link/edit/hide fields are limited to game, platform, region, public username, and visibility.
+- Truth-label copy distinguishes community confirmation from publisher verification.
+- No-password/no-login-code/no-cookie messaging is present at entry and challenge points.
+- Home navigation reaches game-profile management and public lookup.
+- Android export succeeds.
+
+### Migration cases verified
+
+- Both migrations apply from zero in order.
+- The AS-03 migration creates platform, truth-label, and ownership-challenge enums.
+- The migration adds optimistic versioning and uniqueness/index constraints.
+- The ownership-challenge table and foreign keys apply cleanly.
+- The game catalogue seed is idempotent by slug.
+- The legacy-platform preflight is present to refuse unsupported populated values instead of silently coercing them.
+
+### Corrections made during validation
+
+- Replaced a risky Prisma transaction overload type with a narrow structural store type.
+- Omitted optional Prisma filters instead of explicitly passing `undefined` under strict optional typing.
+- Captured and committed the pinned formatter’s exact six-file output.
+- Restored the standard check-only workflow and read-only permissions before the validated checkpoint.
+- Kept the verification-state transition outside all public client inputs.
+- Added explicit public privacy filtering and non-punitive ownership-challenge language.
+
+### Not verified by this CI run
+
+- No eFootball, FC Mobile, Konami, or Electronic Arts API/provider integration was contacted.
+- No publisher verified a username or account.
+- The game-profile mobile flows were not exercised on Android emulator or physical device.
+- No accessibility, screen-reader, large-font, low-memory, offline/retry, or Ghana-representative mobile-network test was run.
+- Staff challenge claiming, conflict checks, evidence requests, resolution, reason codes, appeals, and notifications remain unimplemented.
+- Ownership evidence standards, prohibited evidence, retention, deletion, export, and support training remain unapproved.
+- Challenge abuse rate limits and monitoring are not configured.
+- No real `COMMUNITY_CONFIRMED` assignment operation exists yet.
+- `AUTHORIZED_PROVIDER_VERIFIED` remains a reserved, unused state.
+- No staging/production deployment, monitoring, Android signing, store track, backup restore, or migration rollback drill was run.
+
+### Release interpretation
+
+AS-03 is **implemented and clean-CI validated**, not production-verified. It establishes a safe game-profile boundary for AS-04 registration/tournament work. It is not sufficient to invite real pilot users or resolve ownership disputes until the device, support, privacy, privileged-authentication, and operations gates in `docs/HANDOFF.md`, `docs/GAME_PROFILE_POLICY.md`, and `docs/GHANA_LAUNCH_PLAN.md` are complete.
+
 ## 2026-07-26 AS-02 identity and session checkpoint
 
 **Branch:** `agent/as-02-identity-sessions`  
