@@ -9,11 +9,7 @@ import {
   type UpdateCurrentUserInput,
 } from '@arenasports/contracts';
 import { AppError } from '../../errors.js';
-import type {
-  ExternalPrincipal,
-  IdentityRepository,
-  RequestSecurityContext,
-} from './types.js';
+import type { ExternalPrincipal, IdentityRepository, RequestSecurityContext } from './types.js';
 
 type StoredSession = SessionSummary & {
   providerSessionId: string;
