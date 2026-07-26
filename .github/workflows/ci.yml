@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
@@ -56,8 +56,6 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
 
       - name: Install pnpm
         uses: pnpm/action-setup@v6
@@ -72,19 +70,6 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-
-      - name: Apply and commit AS-03 schema
-        if: github.event_name == 'push' && github.ref == 'refs/heads/agent/as-03-game-profiles'
-        run: |
-          node scripts/apply-as03-schema.mjs
-          pnpm exec prettier --write packages/database/prisma/schema.prisma packages/database/prisma/migrations/20260726110000_game_profiles/migration.sql
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add packages/database/prisma/schema.prisma packages/database/prisma/migrations/20260726110000_game_profiles/migration.sql
-          if ! git diff --cached --quiet; then
-            git commit -m "Add AS-03 game profile schema and migration"
-            git push origin HEAD:${GITHUB_REF_NAME}
-          fi
 
       - name: Check formatting
         run: pnpm format:check
