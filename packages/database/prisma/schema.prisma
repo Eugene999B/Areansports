@@ -27,6 +27,25 @@ enum PlatformRole {
   ADMINISTRATOR
 }
 
+enum GamePlatform {
+  ANDROID
+  IOS
+}
+
+enum GameProfileVerificationState {
+  UNVERIFIED
+  COMMUNITY_CONFIRMED
+  AUTHORIZED_PROVIDER_VERIFIED
+}
+
+enum GameProfileOwnershipChallengeStatus {
+  OPEN
+  RESOLVED_RETAINED
+  RESOLVED_REMOVED
+  DISMISSED
+  WITHDRAWN
+}
+
 enum TournamentStatus {
   DRAFT
   PUBLISHED
@@ -127,16 +146,18 @@ model User {
   createdAt               DateTime   @default(now())
   updatedAt               DateTime   @updatedAt
 
-  externalIdentities ExternalIdentity[]
-  sessions            UserSession[]
-  roleAssignments     RoleAssignment[]
-  gameProfiles        GameProfile[]
-  organized           Tournament[]            @relation("TournamentOrganizer")
-  registrations       TournamentRegistration[]
-  participants        TournamentParticipant[]
-  evidence            Evidence[]
-  openedDisputes      Dispute[]                @relation("DisputeOpener")
-  reviewCases         Dispute[]                @relation("DisputeReviewer")
+  externalIdentities            ExternalIdentity[]
+  sessions                      UserSession[]
+  roleAssignments               RoleAssignment[]
+  gameProfiles                  GameProfile[]
+  gameProfileChallengesOpened   GameProfileOwnershipChallenge[] @relation("GameProfileChallengeChallenger")
+  gameProfileChallengesResolved GameProfileOwnershipChallenge[] @relation("GameProfileChallengeResolver")
+  organized                     Tournament[]                     @relation("TournamentOrganizer")
+  registrations                 TournamentRegistration[]
+  participants                  TournamentParticipant[]
+  evidence                      Evidence[]
+  openedDisputes                Dispute[]                        @relation("DisputeOpener")
+  reviewCases                   Dispute[]                        @relation("DisputeReviewer")
 
   @@index([status])
 }
@@ -208,25 +229,49 @@ model Game {
 }
 
 model GameProfile {
-  id                 String   @id @default(cuid())
+  id                 String                       @id @default(cuid())
   userId             String
   gameId             String
-  platform           String
+  platform           GamePlatform
   region             String
   username           String
   normalizedUsername String
-  verificationState  String   @default("UNVERIFIED")
-  visible            Boolean  @default(true)
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  verificationState  GameProfileVerificationState @default(UNVERIFIED)
+  visible            Boolean                      @default(true)
+  version            Int                          @default(1)
+  createdAt          DateTime                     @default(now())
+  updatedAt          DateTime                     @updatedAt
 
-  user          User                     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  game          Game                     @relation(fields: [gameId], references: [id], onDelete: Restrict)
-  registrations TournamentRegistration[]
-  participants  TournamentParticipant[]
+  user                User                              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  game                Game                              @relation(fields: [gameId], references: [id], onDelete: Restrict)
+  registrations       TournamentRegistration[]
+  participants        TournamentParticipant[]
+  ownershipChallenges GameProfileOwnershipChallenge[]
 
   @@unique([gameId, platform, region, normalizedUsername])
-  @@index([userId])
+  @@unique([userId, gameId, platform, region])
+  @@index([userId, visible])
+}
+
+model GameProfileOwnershipChallenge {
+  id             String                              @id @default(cuid())
+  gameProfileId  String
+  challengerId   String
+  statement      String
+  status         GameProfileOwnershipChallengeStatus @default(OPEN)
+  openKey        String?                             @unique
+  resolvedById   String?
+  resolutionNote String?
+  resolvedAt     DateTime?
+  createdAt      DateTime                            @default(now())
+  updatedAt      DateTime                            @updatedAt
+
+  gameProfile GameProfile @relation(fields: [gameProfileId], references: [id], onDelete: Restrict)
+  challenger  User        @relation("GameProfileChallengeChallenger", fields: [challengerId], references: [id], onDelete: Restrict)
+  resolvedBy  User?       @relation("GameProfileChallengeResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+
+  @@index([gameProfileId, status, createdAt])
+  @@index([challengerId, createdAt])
 }
 
 model Tournament {

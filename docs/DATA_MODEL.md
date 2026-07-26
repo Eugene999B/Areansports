@@ -56,11 +56,50 @@ An assignment contains:
 
 The default new-account assignment is `PLAYER` at platform scope. Provider claims never create privileged roles. The current schema supports explicit scope fields; resource-specific tournament staff policy and management endpoints remain future work.
 
-### GameProfile — schema scaffold; AS-03 behaviour planned
+### GameProfile — implemented in AS-03
 
-A public identity used inside a supported game: user, game, platform, region, username, normalized lookup value, verification state, and visibility. Verification state describes ArenaSports evidence/community confidence; it must not imply publisher certification without an authorized adapter.
+A player-controlled public identity used inside one supported game:
 
-Game profiles never contain game passwords or private game-account credentials.
+- ArenaSports user and supported `Game`;
+- `ANDROID` or `IOS` platform;
+- bounded game-region code;
+- cleaned display username and normalized comparison value;
+- truth label;
+- per-profile visibility;
+- optimistic version;
+- created and updated timestamps.
+
+Normalization uses Unicode NFKC, trim, collapsed internal whitespace, and case-insensitive comparison. Control, zero-width, and bidirectional override/isolation characters are rejected before persistence.
+
+Truth labels are:
+
+- `UNVERIFIED`: player supplied;
+- `COMMUNITY_CONFIRMED`: completed ArenaSports community review, not publisher verification;
+- `AUTHORIZED_PROVIDER_VERIFIED`: reserved for a future authorized provider adapter.
+
+Clients cannot set the truth label. New profiles always start `UNVERIFIED`.
+
+Constraints prevent:
+
+- duplicate normalized username in one game/platform/region;
+- more than one profile slot for the same user/game/platform/region;
+- stale concurrent edits through the version check.
+
+Game profiles never contain game passwords, login codes, cookies, recovery credentials, or private game-account tokens.
+
+### GameProfileOwnershipChallenge — implemented creation only in AS-03
+
+A private, audited claim that another visible game profile may belong to the challenger or may be impersonating them:
+
+- challenged game profile;
+- challenger;
+- private statement;
+- `OPEN`, resolved, dismissed, or withdrawn status;
+- unique open-case key per challenger/profile;
+- optional resolver, resolution note, and resolution time;
+- created and updated timestamps.
+
+AS-03 implements safe creation only. Opening a challenge does not hide, transfer, remove, suspend, punish, or change a truth label. Privileged resolution operations require a later slice with stronger authentication, conflict checks, evidence/retention rules, appeal policy, and audit.
 
 ### Block / Report / Sanction — planned
 
@@ -78,11 +117,20 @@ Account bootstrap commits the following together:
 
 Profile updates and session revocations commit their state change and audit event in the same transaction. Unique constraints protect concurrent duplicate handles, provider subjects, verified contacts, role assignments, and provider sessions.
 
+Game-profile creation/update and ownership-challenge creation also commit their state and audit event together. Database uniqueness remains the final concurrency guard after application-level conflict checks.
+
 ## Games and rules
 
-### Game
+### Game — implemented catalogue foundation
 
 Catalog record that avoids hard-coding one publisher or country. The current schema stores slug, name, optional publisher, active state, and result-provider capability label.
+
+Migration `20260726110000_game_profiles` seeds:
+
+- eFootball / Konami;
+- EA SPORTS FC Mobile / Electronic Arts.
+
+The current result-provider capability remains evidence/community based; seeded publisher names do not imply an integration or affiliation.
 
 ### RulesetVersion
 
@@ -220,7 +268,13 @@ AS-02 emits:
 - `IDENTITY.SESSION_CREATED`;
 - `IDENTITY.SESSION_REVOKED`.
 
-Audit events must not contain raw tokens, OTP codes, private evidence URLs, passwords, or unnecessary personal data. Debug logs are not audit logs.
+AS-03 emits:
+
+- `GAME_PROFILE.CREATED`;
+- `GAME_PROFILE.UPDATED`;
+- `GAME_PROFILE.OWNERSHIP_CHALLENGE_OPENED`.
+
+Audit events must not contain raw tokens, OTP codes, game credentials, private challenge statements, private evidence URLs, passwords, or unnecessary personal data. Debug logs are not audit logs.
 
 ## State transitions
 
@@ -243,6 +297,28 @@ ACTIVE -> REVOKED
 ```
 
 Expiry comes from the provider token/session boundary. Revocation is ArenaSports-local denial and must be combined with provider sign-out/revocation where applicable.
+
+### GameProfile
+
+```text
+UNVERIFIED -> COMMUNITY_CONFIRMED
+UNVERIFIED -> AUTHORIZED_PROVIDER_VERIFIED
+COMMUNITY_CONFIRMED -> UNVERIFIED                (correction/review)
+COMMUNITY_CONFIRMED -> AUTHORIZED_PROVIDER_VERIFIED
+```
+
+AS-03 user endpoints do not perform these truth-label transitions. They require privileged, audited policy operations or an authorized provider adapter.
+
+### GameProfileOwnershipChallenge
+
+```text
+OPEN -> RESOLVED_RETAINED
+OPEN -> RESOLVED_REMOVED
+OPEN -> DISMISSED
+OPEN -> WITHDRAWN
+```
+
+AS-03 creates `OPEN` cases only. Resolution is future privileged functionality.
 
 ### Tournament
 
@@ -279,7 +355,10 @@ Alternate outcomes: `RESCHEDULED`, `FORFEIT_PENDING`, `VOID`, and versioned corr
 - Unique normalized verified email/phone when present.
 - Unique provider session identifier.
 - Unique role assignment per user/role/scope.
-- Unique active game profile identity per game/platform/region where policy requires.
+- Unique normalized game username per game/platform/region.
+- Unique game-profile slot per user/game/platform/region.
+- Unique open ownership challenge per challenger/profile.
+- Optimistic version on game-profile edits.
 - Unique registration per user/tournament.
 - Unique participant slot per tournament.
 - Unique match reference.
@@ -297,6 +376,8 @@ Exact durations require legal/product approval.
 - External identity/contact metadata: account lifetime plus limited recovery and integrity window.
 - Session metadata: short security/support period appropriate to session and incident investigation needs.
 - Account/profile: account lifetime plus limited recovery window.
+- Public game profile: account lifetime and historical competition snapshot requirements.
+- Ownership challenge statement/review material: shortest support/safety period justified by review and appeal policy, strictly access-controlled.
 - Public competition record: long-lived for transparency, subject to lawful deletion/anonymization.
 - Raw evidence: shortest practical configurable period after final appeal.
 - Evidence digest/audit metadata: longer where lawful for integrity.
@@ -306,6 +387,8 @@ Exact durations require legal/product approval.
 
 ## Migration discipline
 
-The committed `20260726090000_initial_foundation` PostgreSQL migration is the baseline for the current schema. CI applies migrations from zero against disposable PostgreSQL before database-backed tests.
+The committed `20260726090000_initial_foundation` PostgreSQL migration is the baseline. Migration `20260726110000_game_profiles` adds AS-03 enums, optimistic versioning, ownership challenges, uniqueness/indexes, and the supported game catalogue. CI applies both migrations from zero against disposable PostgreSQL before database-backed tests.
+
+The AS-03 migration includes a preflight block that refuses to coerce unsupported legacy platform strings into the new mobile-platform enum. A populated environment must inventory and remediate any incompatible values before deployment.
 
 Every future migration needs expected lock/rewrite behaviour, deployment order, compatibility window, recovery plan, and data-backfill observability. Destructive migrations use expand/migrate/contract rather than one-step deletion.

@@ -51,9 +51,27 @@ The roadmap is organized by risk reduction. Dates are added only when a staffed 
 
 **Status:** Implemented and clean-CI validated. Live provider/device checks remain release gates, so AS-02 is not yet production-verified.
 
+### Game profile checkpoint — AS-03
+
+- [x] eFootball and EA SPORTS FC Mobile catalogue
+- [x] Android/iOS platform and game-region fields
+- [x] Public username linking without game credentials
+- [x] Unicode NFKC, case, whitespace, invisible-character, and bidirectional-spoof safeguards
+- [x] Unique username per game/platform/region
+- [x] One profile slot per user/game/platform/region
+- [x] `UNVERIFIED`, `COMMUNITY_CONFIRMED`, and reserved authorised-provider truth labels
+- [x] Per-profile visibility and public-handle lookup
+- [x] Optimistic-version profile edits
+- [x] Audited ownership-challenge creation with duplicate/self-challenge protection
+- [x] PostgreSQL migration, API routes, mobile management/lookup, and integration tests
+- [ ] Real-device interaction and accessibility validation
+- [ ] Staff resolution operations with stronger authentication and conflict checks
+- [ ] Approved evidence request, retention, appeal, and support procedures
+
+**Status:** Implemented and clean-CI validated. Ownership challenge resolution and live-device/support operations remain unverified release work.
+
 ### Remaining Phase 1 work
 
-- [ ] Game profiles with platform, region, public username, normalization, and ownership safeguards — AS-03
 - [ ] Organizer profile and explainable trust indicators
 - [ ] PostgreSQL tournament draft/publish/cancel lifecycle — AS-04
 - [ ] Public, unlisted, invite-only, and approval-required access

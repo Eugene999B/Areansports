@@ -83,7 +83,7 @@ Common HTTP mapping:
 - `429` rate limited
 - `503` dependency unavailable, authentication not configured, or maintenance state
 
-Identity error codes currently include:
+Identity and game-profile error codes currently include:
 
 - `AUTHENTICATION_REQUIRED`
 - `AUTHENTICATION_INVALID`
@@ -96,6 +96,11 @@ Identity error codes currently include:
 - `HANDLE_UNAVAILABLE`
 - `SESSION_REVOKED`
 - `FORBIDDEN`
+- `GAME_NOT_SUPPORTED`
+- `GAME_PROFILE_USERNAME_TAKEN`
+- `GAME_PROFILE_SLOT_TAKEN`
+- `OWNERSHIP_CHALLENGE_EXISTS`
+- `VERSION_CONFLICT`
 
 ## Idempotency
 
@@ -108,7 +113,7 @@ For routes marked idempotent:
 - retain records beyond the practical mobile retry window;
 - commit the transaction and response record consistently.
 
-Account bootstrap is guarded by unique provider subject, normalized handle, normalized verified contact, and provider session constraints. Later retryable competition mutations still require explicit `Idempotency-Key` support.
+Account bootstrap is guarded by unique provider subject, normalized handle, normalized verified contact, and provider session constraints. Game-profile creation is guarded by normalized username and per-user slot constraints. Ownership challenge creation uses a unique open-case key per challenger/profile. Later retryable competition mutations still require explicit `Idempotency-Key` support.
 
 ## Pagination and filtering
 
@@ -163,15 +168,74 @@ Revokes one session belonging to the authenticated user and emits `IDENTITY.SESS
 
 ### Planned current-user endpoints
 
-- `GET /me/game-profiles`
-- `POST /me/game-profiles`
-- `PATCH /me/game-profiles/:gameProfileId`
-- `DELETE /me/game-profiles/:gameProfileId`
 - `GET /me/notifications`
 - `POST /me/notifications/:notificationId/read`
 - `GET /me/competition-history`
 - `POST /me/export-requests`
 - `POST /me/deletion-requests`
+
+## Game profiles — AS-03 implemented
+
+Game profiles contain public in-game usernames only. They never contain a game password, login code, cookie, recovery credential, or publisher token.
+
+### `GET /games` — implemented
+
+Returns the active supported catalogue. The AS-03 migration seeds eFootball and EA SPORTS FC Mobile, with Android and iOS mobile platforms.
+
+### `GET /me/game-profiles` — implemented
+
+Returns all profiles owned by the authenticated ArenaSports user, including hidden profiles, optimistic version, truth label, and open ownership-challenge count.
+
+### `POST /me/game-profiles` — implemented
+
+Links one public username for a supported game, platform, and region. New records always start as `UNVERIFIED`; clients cannot choose a verification state.
+
+Uniqueness and abuse controls:
+
+- Unicode NFKC, trim, collapsed whitespace, and case-insensitive comparison;
+- control, zero-width, and bidirectional override/isolation characters rejected;
+- one normalized username per game/platform/region;
+- one profile slot per user/game/platform/region;
+- no game credential fields accepted.
+
+Emits `GAME_PROFILE.CREATED` transactionally.
+
+### `PATCH /me/game-profiles/:profileId` — implemented
+
+Updates the owner’s platform, region, public username, or visibility. The request includes the current body `version`; stale edits return `VERSION_CONFLICT`. Verification state cannot be changed through this endpoint.
+
+Emits `GAME_PROFILE.UPDATED` transactionally.
+
+### `GET /players/:handle/game-profiles` — implemented public lookup
+
+Returns only visible game profiles when the ArenaSports account is active and the owner’s main profile is public. Hidden, suspended, deleted, and unknown profiles all return an empty collection without revealing which privacy condition applied.
+
+Truth labels:
+
+- `UNVERIFIED`: player-supplied public username;
+- `COMMUNITY_CONFIRMED`: completed ArenaSports community review, not publisher verification;
+- `AUTHORIZED_PROVIDER_VERIFIED`: reserved for a future authorized provider adapter.
+
+### `POST /game-profiles/:profileId/ownership-challenges` — implemented creation only
+
+A signed-in player may open one private ownership challenge against another player’s visible profile with a bounded statement. Self-challenges and duplicate simultaneous challenges return `409`.
+
+Opening a challenge:
+
+- emits `GAME_PROFILE.OWNERSHIP_CHALLENGE_OPENED`;
+- does not automatically hide, remove, transfer, suspend, or punish;
+- does not change the truth label;
+- does not make the statement public.
+
+Staff resolution, evidence requests, appeals, and privileged challenge-state changes remain planned and require stronger authentication, conflict checks, audit, retention policy, and support procedures.
+
+### Planned game endpoints
+
+- `GET /games/:gameId`
+- `GET /games/:gameId/platforms`
+- `GET /games/:gameId/ruleset-presets`
+
+Responses must expose capability truth, including whether an authorized result provider exists.
 
 ## Roles and authorization
 
@@ -183,17 +247,6 @@ Platform roles are `PLAYER`, `ORGANIZER`, `MODERATOR`, and `ADMINISTRATOR`.
 - `ADMINISTRATOR` may pass platform-role checks but still requires resource and conflict-of-interest policy where applicable.
 - Future tournament roles must be scoped to explicit resources and expiry.
 - Role changes require audited platform operations; no public role-assignment endpoint exists yet.
-
-## Games
-
-Planned:
-
-- `GET /games`
-- `GET /games/:gameId`
-- `GET /games/:gameId/platforms`
-- `GET /games/:gameId/ruleset-presets`
-
-Responses expose supported capability truth, including whether an authorized result provider exists.
 
 ## Tournaments
 
@@ -255,7 +308,7 @@ Planned:
 - `POST /matches/:matchId/no-show-claims`
 - `POST /matches/:matchId/reschedule-requests`
 
-Match detail will expose the user's allowed actions, not only raw status, so mobile does not duplicate policy.
+Match detail will expose the user’s allowed actions, not only raw status, so mobile does not duplicate policy.
 
 ## Evidence
 
@@ -278,33 +331,3 @@ Player endpoints planned:
 - `POST /disputes/:disputeId/appeals`
 
 Reviewer endpoints planned:
-
-- `GET /moderation/cases`
-- `POST /moderation/cases/:caseId/claim`
-- `POST /moderation/cases/:caseId/decisions`
-- `POST /moderation/cases/:caseId/release`
-
-A decision request includes expected case version, reason code, explanation, structured outcome, and conflict-of-interest attestation.
-
-## Trust and safety
-
-Planned:
-
-- `POST /reports`
-- `GET /me/reports`
-- `POST /users/:userId/block`
-- `DELETE /users/:userId/block`
-- restricted administrator sanction and appeal endpoints behind separate authorization and auditing.
-
-## Organizer analytics
-
-Only aggregated, privacy-safe operational information:
-
-- `GET /tournaments/:tournamentId/analytics/operations`
-- `GET /tournaments/:tournamentId/audit-events`
-
-Raw cross-user security signals are not organizer analytics.
-
-## Versioning
-
-Backward-compatible additions stay within `v1`. Breaking semantics require a new API version or explicit contract version. Ruleset schema, fixture generator, scoring engine, and provider adapters carry independent versions for historical reproducibility.

@@ -54,6 +54,57 @@ export type AccountProfileInput = {
   notificationPreferences?: NotificationPreferences;
 };
 
+export type GamePlatform = 'ANDROID' | 'IOS';
+export type GameProfileVerificationState =
+  'UNVERIFIED' | 'COMMUNITY_CONFIRMED' | 'AUTHORIZED_PROVIDER_VERIFIED';
+
+export type GameCatalogEntry = {
+  id: string;
+  slug: string;
+  name: string;
+  publisher: string | null;
+  active: boolean;
+  allowedPlatforms: GamePlatform[];
+};
+
+export type GameProfile = {
+  id: string;
+  userId: string;
+  game: Omit<GameCatalogEntry, 'allowedPlatforms'>;
+  platform: GamePlatform;
+  region: string;
+  username: string;
+  verificationState: GameProfileVerificationState;
+  visible: boolean;
+  version: number;
+  openOwnershipChallengeCount: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type PublicGameProfile = Omit<GameProfile, 'userId' | 'openOwnershipChallengeCount'>;
+
+export type CreateGameProfileInput = {
+  gameSlug: string;
+  platform: GamePlatform;
+  region: string;
+  username: string;
+  visible: boolean;
+};
+
+export type UpdateGameProfileInput = Partial<
+  Pick<CreateGameProfileInput, 'platform' | 'region' | 'username' | 'visible'>
+> & { version: number };
+
+export type GameProfileOwnershipChallenge = {
+  id: string;
+  gameProfileId: string;
+  challengerId: string;
+  status: 'OPEN' | 'RESOLVED_RETAINED' | 'RESOLVED_REMOVED' | 'DISMISSED' | 'WITHDRAWN';
+  createdAt: string;
+  updatedAt: string;
+};
+
 type ApiErrorResponse = {
   error?: {
     code?: string;
@@ -164,5 +215,48 @@ export function revokeSession(accessToken: string, sessionId: string): Promise<v
   return requestData(`/me/sessions/${encodeURIComponent(sessionId)}`, {
     accessToken,
     method: 'DELETE',
+  });
+}
+
+export function fetchGameCatalogue(): Promise<GameCatalogEntry[]> {
+  return requestData('/games');
+}
+
+export function fetchMyGameProfiles(accessToken: string): Promise<GameProfile[]> {
+  return requestData('/me/game-profiles', { accessToken });
+}
+
+export function createGameProfile(
+  accessToken: string,
+  input: CreateGameProfileInput,
+): Promise<GameProfile> {
+  return requestData('/me/game-profiles', { accessToken, body: input, method: 'POST' });
+}
+
+export function updateGameProfile(
+  accessToken: string,
+  profileId: string,
+  input: UpdateGameProfileInput,
+): Promise<GameProfile> {
+  return requestData(`/me/game-profiles/${encodeURIComponent(profileId)}`, {
+    accessToken,
+    body: input,
+    method: 'PATCH',
+  });
+}
+
+export function fetchPublicGameProfiles(handle: string): Promise<PublicGameProfile[]> {
+  return requestData(`/players/${encodeURIComponent(handle)}/game-profiles`);
+}
+
+export function createGameProfileOwnershipChallenge(
+  accessToken: string,
+  profileId: string,
+  statement: string,
+): Promise<GameProfileOwnershipChallenge> {
+  return requestData(`/game-profiles/${encodeURIComponent(profileId)}/ownership-challenges`, {
+    accessToken,
+    body: { statement },
+    method: 'POST',
   });
 }

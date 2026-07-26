@@ -21,6 +21,8 @@ export default function RootLayout() {
           <Stack.Screen name="auth/verify" options={{ title: 'Verify email' }} />
           <Stack.Screen name="auth/profile" options={{ title: 'Create profile' }} />
           <Stack.Screen name="account" options={{ title: 'Your account' }} />
+          <Stack.Screen name="game-profiles/index" options={{ title: 'Your game identities' }} />
+          <Stack.Screen name="game-profiles/find" options={{ title: 'Find player identities' }} />
           <Stack.Screen name="tournaments/index" options={{ title: 'Find tournaments' }} />
           <Stack.Screen name="tournaments/[id]" options={{ title: 'Tournament' }} />
           <Stack.Screen name="create-tournament" options={{ title: 'Create tournament' }} />
