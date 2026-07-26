@@ -108,14 +108,19 @@ export class InMemoryIdentityRepository implements IdentityRepository {
     }
 
     const updated: CurrentUser = {
-      ...current,
-      ...input,
+      id: current.id,
       handle: input.handle?.trim() ?? current.handle,
       displayName: input.displayName?.trim() ?? current.displayName,
+      countryCode: input.countryCode ?? current.countryCode,
+      timezone: input.timezone ?? current.timezone,
       avatarUrl: input.avatarUrl === undefined ? current.avatarUrl : input.avatarUrl,
+      profileVisible: input.profileVisible ?? current.profileVisible,
       notificationPreferences: input.notificationPreferences
         ? NotificationPreferencesSchema.parse(input.notificationPreferences)
         : current.notificationPreferences,
+      status: current.status,
+      roles: current.roles,
+      createdAt: current.createdAt,
       updatedAt: new Date().toISOString(),
     };
 
